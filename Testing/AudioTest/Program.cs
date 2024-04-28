@@ -25,25 +25,7 @@ internal class Program
         //foreach (var f in F)
         //{ Console.WriteLine(f); }
 
-        //NCA();
-
-        CSC();
-    }
-
-    private static void CSC()
-    {
-        MP.Load(FileLoc);
-        MP.Play();
-
-        float Vol = 50;
-
-        MP.Volume(Vol);
-
-        while (true)
-        {
-            float.TryParse(Console.ReadLine(), out Vol);
-            MP.Volume(Vol);
-        }
+        NCA();
     }
 
     private static void NCA()
