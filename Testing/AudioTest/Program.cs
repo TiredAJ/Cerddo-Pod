@@ -1,4 +1,5 @@
 ﻿using NetCoreAudio;
+using SharpAudio;
 using System.Reflection;
 
 namespace AudioTest;
@@ -6,9 +7,6 @@ namespace AudioTest;
 internal class Program
 {
     private static readonly string FileLoc = "/run/media/tiredaj/AJStore/GitHub/MP3-Pod/Testing/AudioTest/bin/Debug/net8.0/Assets/82-99 F.M.wav";
-
-    private static readonly MusicPlayer MP = new();
-
 
     static void Main(string[] args)
     {
@@ -66,14 +64,4 @@ internal class Program
         }
         Console.WriteLine("Stopping...");
     }
-
-
-
-    //private static void NA()
-    //{
-    //    using (var AudioFile = audiofile)
-    //    {
-    //
-    //    }
-    //}
 }
