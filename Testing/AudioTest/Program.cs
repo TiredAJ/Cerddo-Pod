@@ -1,6 +1,6 @@
 ﻿using NetCoreAudio;
-using SharpAudio;
 using System.Reflection;
+using Pie.Audio;
 
 namespace AudioTest;
 
@@ -23,10 +23,12 @@ internal class Program
         //foreach (var f in F)
         //{ Console.WriteLine(f); }
 
-        NCA();
+        //NCA();
+
+        
     }
 
-    private static void NCA()
+    private static void NCA()   
     {
         Player P = new Player();
 
@@ -63,5 +65,10 @@ internal class Program
             }
         }
         Console.WriteLine("Stopping...");
+    }
+
+    private static void Pi()
+    {
+        
     }
 }
