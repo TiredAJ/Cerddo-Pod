@@ -1,13 +1,15 @@
-﻿using NetCoreAudio;
+﻿using NAudio.Wave;
+using NetCoreAudio;
 using System.Reflection;
-
-using AudioTest.Utils;
 
 namespace AudioTest;
 
 internal class Program
 {
-    private static readonly string FileLoc = "/run/media/tiredaj/AJStore/GitHub/MP3-Pod/Testing/AudioTest/bin/Debug/net8.0/Assets/82-99 F.M.wav";
+    private static readonly string FileLoc = "Assets\\82-99 F.M.wav";
+
+    //private static readonly Uri FileLoc = new Uri("Assets/82-99 F.M.wav", UriKind.Relative);
+    //private static readonly Uri FileLoc = new Uri("\"E:\\GitHub\\MP3-Pod\\Testing\\AudioTest\\bin\\Debug\\net8.0\\Assets\\82-99 F.M.wav\"", UriKind.Absolute);
 
     static void Main(string[] args)
     {
@@ -19,17 +21,23 @@ internal class Program
 
         Console.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
-        //var F = Directory.GetFiles(), "", SearchOption.AllDirectories);
+        if (Directory.Exists(FileLoc))
+        {
+            foreach (var F in Directory.GetFiles("AudioTest:///Assets/"))
+            { Console.WriteLine(F); }
+        }
+        else
+        { Console.WriteLine("No :("); }
 
-        //foreach (var f in F)
-        //{ Console.WriteLine(f); }
+
+        NA();
 
         //NCA();
 
-        
+
     }
 
-    private static void NCA()   
+    private static void NCA()
     {
         Player P = new Player();
 
@@ -54,7 +62,7 @@ internal class Program
                 case "p":
                 { _ = P.Paused ? P.Resume() : P.Pause(); break; }
                 case "q":
-                { P.Stop(); Loop = false;  break; }
+                { P.Stop(); Loop = false; break; }
                 default:
                 {
                     if (bVol)
@@ -68,8 +76,20 @@ internal class Program
         Console.WriteLine("Stopping...");
     }
 
-    private void XTTest()
+    private static void NA()
     {
-        XTSample XTS = new XTSample();
+        using (var AF = new AudioFileReader(FileLoc))
+        using (var OutDev = new WaveOutEvent())
+        {
+            OutDev.Init(AF);
+            OutDev.Play();
+
+            OutDev.Volume = 0.25f;
+
+            while (OutDev.PlaybackState == PlaybackState.Playing)
+            { Thread.Sleep(2500); }
+
+            OutDev.Stop();
+        }
     }
 }

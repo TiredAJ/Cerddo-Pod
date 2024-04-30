@@ -9,15 +9,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NAudio.Asio" Version="2.2.1" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="NAudio.Core" Version="2.2.1" />
-    <PackageReference Include="NAudio.Midi" Version="2.2.1" />
-    <PackageReference Include="NAudio.Wasapi" Version="2.2.1" />
     <PackageReference Include="NetCoreAudio" Version="2.0.0" />
     <PackageReference Include="SharpAudio.Codec" Version="1.0.65-beta" />
     <PackageReference Include="Silk.NET.OpenAL" Version="2.21.0" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Resource Include="Assets\**"/>
+	</ItemGroup>
+	
   <ItemGroup>
     <None Update="Assets\82-99 F.M.flac">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
