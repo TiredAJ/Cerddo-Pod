@@ -1,6 +1,6 @@
-﻿using NAudio.Wave;
-using NetCoreAudio;
-using System.Reflection;
+﻿using NetCoreAudio;
+using SharpAudio;
+using SharpAudio.Codec;
 
 namespace AudioTest;
 
@@ -17,11 +17,11 @@ internal class Program
 
         Console.Clear();
 
-        Thread.Sleep(3000);
+        //Thread.Sleep(3000);
 
-        Console.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+        //Console.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
-        NA();
+        SA();
 
         //NCA();
     }
@@ -65,20 +65,12 @@ internal class Program
         Console.WriteLine("Stopping...");
     }
 
-    private static void NA()
+    private static void SA()
     {
-        using (var AF = new AudioFileReader(FileLoc))
-        using (var OutDev = new WaveOutEvent())
-        {
-            OutDev.Init(AF);
-            OutDev.Play();
+        var ENG = AudioEngine.CreateDefault();
+        var SSound = new SoundStream(File.OpenRead(FileLoc), ENG);
 
-            OutDev.Volume = 0.125f;
-
-            while (OutDev.PlaybackState == PlaybackState.Playing)
-            { Thread.Sleep(2500); }
-
-            OutDev.Stop();
-        }
+        SSound.Volume = 0.125f;
+        SSound.Play();
     }
 }

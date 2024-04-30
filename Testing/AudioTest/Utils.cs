@@ -1,5 +1,3 @@
-namespace AudioTest.Utils;
-
 //public unsafe class SilkPlayer
 //{
 //    short numChannels = -1;
@@ -24,3 +22,4 @@ namespace AudioTest.Utils;
 //        var Device = ALC.OpenDevice("");
 //    }
 //}
+
