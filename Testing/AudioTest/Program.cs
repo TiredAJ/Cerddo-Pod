@@ -17,24 +17,13 @@ internal class Program
 
         Console.Clear();
 
-        //Thread.Sleep(3000);
+        Thread.Sleep(3000);
 
         Console.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-
-        if (Directory.Exists(FileLoc))
-        {
-            foreach (var F in Directory.GetFiles("AudioTest:///Assets/"))
-            { Console.WriteLine(F); }
-        }
-        else
-        { Console.WriteLine("No :("); }
-
 
         NA();
 
         //NCA();
-
-
     }
 
     private static void NCA()
@@ -84,7 +73,7 @@ internal class Program
             OutDev.Init(AF);
             OutDev.Play();
 
-            OutDev.Volume = 0.25f;
+            OutDev.Volume = 0.125f;
 
             while (OutDev.PlaybackState == PlaybackState.Playing)
             { Thread.Sleep(2500); }

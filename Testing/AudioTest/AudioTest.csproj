@@ -9,15 +9,25 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NAudio" Version="2.2.1" />
-    <PackageReference Include="NAudio.Core" Version="2.2.1" />
     <PackageReference Include="NetCoreAudio" Version="2.0.0" />
     <PackageReference Include="SharpAudio.Codec" Version="1.0.65-beta" />
     <PackageReference Include="Silk.NET.OpenAL" Version="2.21.0" />
   </ItemGroup>
 
 	<ItemGroup>
-		<Resource Include="Assets\**"/>
+		<Resource Include="Assets\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="NAudio">
+	    <HintPath>..\..\..\_NotMine\naudio\NAudio\bin\Debug\net6.0\NAudio.dll</HintPath>
+	  </Reference>
+	  <Reference Include="NAudio.Core">
+	    <HintPath>..\..\..\_NotMine\naudio\NAudio\bin\Debug\net6.0\NAudio.Core.dll</HintPath>
+	  </Reference>
+	  <Reference Include="NAudio.WinMM">
+	    <HintPath>..\..\..\_NotMine\naudio\NAudio\bin\Debug\net6.0\NAudio.WinMM.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 	
   <ItemGroup>
