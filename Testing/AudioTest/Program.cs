@@ -1,76 +1,41 @@
-﻿using NetCoreAudio;
-using SharpAudio;
+﻿using SharpAudio;
 using SharpAudio.Codec;
 
 namespace AudioTest;
 
 internal class Program
 {
-    private static readonly string FileLoc = "Assets\\82-99 F.M.wav";
-
-    //private static readonly Uri FileLoc = new Uri("Assets/82-99 F.M.wav", UriKind.Relative);
-    //private static readonly Uri FileLoc = new Uri("\"E:\\GitHub\\MP3-Pod\\Testing\\AudioTest\\bin\\Debug\\net8.0\\Assets\\82-99 F.M.wav\"", UriKind.Absolute);
+    private static readonly string FileLoc = $"Assets{Path.DirectorySeparatorChar}82-99 F.M.wav";
 
     static void Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
-
         Console.Clear();
 
         //Thread.Sleep(3000);
 
-        //Console.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-
         SA();
-
-        //NCA();
-    }
-
-    private static void NCA()
-    {
-        Player P = new Player();
-
-        P.Play(FileLoc);
-
-        P.PlaybackFinished += (object? Sender, EventArgs e) => { Console.WriteLine("Stopped!"); };
-
-        string Input;
-        byte Vol = 0;
-        bool bVol = false, Loop = true;
-
-        while (Loop)
-        {
-            Console.WriteLine("Please enter a command: [p] to toggle pause, [q] to quit " +
-            "[0-100] for volume");
-
-            Input = Console.ReadLine().ToLower();
-            bVol = byte.TryParse(Input, out Vol);
-
-            switch (Input)
-            {
-                case "p":
-                { _ = P.Paused ? P.Resume() : P.Pause(); break; }
-                case "q":
-                { P.Stop(); Loop = false; break; }
-                default:
-                {
-                    if (bVol)
-                    { P.SetVolume(Vol); bVol = false; }
-                    else
-                    { Console.WriteLine("Invalid command"); }
-                    break;
-                }
-            }
-        }
-        Console.WriteLine("Stopping...");
     }
 
     private static void SA()
     {
         var ENG = AudioEngine.CreateDefault();
-        var SSound = new SoundStream(File.OpenRead(FileLoc), ENG);
+        var SoundA = new SoundStream(File.OpenRead(FileLoc), ENG);
+        var SoundB = new SoundStream(File.OpenRead(FileLoc), ENG);
 
-        SSound.Volume = 0.125f;
-        SSound.Play();
+        SoundA.Volume = 0.0125f;
+        //SoundB.Volume = 0.0125f;
+
+        SoundA.Play();
+        //change to push
+        Thread.Sleep(300);
+
+        SoundB.Play();
+
+        SoundB.PropertyChanged += SoundB_PropertyChanged;
+    }
+
+    private static void SoundB_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        Console.WriteLine(e.PropertyName);
     }
 }
