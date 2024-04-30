@@ -1,29 +1,28 @@
-using Pie;
-using Pie.Audio;
-using Pie.Audio.Stream;
-
-using PieStream = Pie.Audio.Stream.Stream;
+using Silk.NET.OpenAL;
 
 namespace AudioTest.Utils;
 
-public class PieStreamPlayer : IDisposable
+public unsafe class SilkPlayer
 {
-    private AudioDevice AD;
-    private PieStream Strm;
-    private AudioFormat AF;
-    private byte[] Buff;
-    private AudioBuffer[] Buffs;
-    private int CurBuff;
-    private ushort Vo;
-    private object Lock = new object();
+    short numChannels = -1;
+    int sampleRate = -1;
+    int byteRate = -1;
+    short blockAlign = -1;
+    short bitsPerSample = -1;
+    BufferFormat format = 0;
 
-    public PieStreamPlayer(AudioDevice _AD, string _Path)
+    ALContext ALC;
+    AL ALApi;
+
+    public unsafe SilkPlayer()
     {
-        AD = _AD;
-        Strm = PieStream.FromFile(_Path);
 
         
 
-        //gay 29/04/2024 21:43
+        ALC = ALContext.GetApi();
+
+        ALApi = AL.GetApi();
+
+        var Device = ALC.OpenDevice("");
     }
 }

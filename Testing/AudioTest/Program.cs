@@ -1,6 +1,7 @@
 ﻿using NetCoreAudio;
 using System.Reflection;
-using Pie.Audio;
+
+using AudioTest.Utils;
 
 namespace AudioTest;
 
@@ -67,8 +68,8 @@ internal class Program
         Console.WriteLine("Stopping...");
     }
 
-    private static void Pi()
+    private void XTTest()
     {
-        
+        XTSample XTS = new XTSample();
     }
 }
