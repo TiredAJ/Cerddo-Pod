@@ -398,4 +398,14 @@ FodyWeavers.xsd
 *.sln.iml
 
 # misc
-Testing/AudioTest/Assets/*
+*.wav
+*.flac
+*.mp3
+*.mp4
+*.aac
+*.ogg
+*.wma
+*.pcm
+*.lpcm
+*.aiff
+*.alac
