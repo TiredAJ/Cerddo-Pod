@@ -398,6 +398,4 @@ FodyWeavers.xsd
 *.sln.iml
 
 # misc
-*.mp3
-*.flac
-*.wav
+Testing/AudioTest/Assets/*
