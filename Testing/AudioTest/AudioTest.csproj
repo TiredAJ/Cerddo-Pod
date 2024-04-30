@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MetadataExtractor" Version="2.9.0-rc2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="SharpAudio" Version="1.0.65-beta" />
     <PackageReference Include="SharpAudio.ALBinding" Version="1.0.65-beta" />
@@ -16,16 +17,20 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<Resource Include="Assets\**" />
+		<Resource Include="Assets\**">
+		</Resource>
 	</ItemGroup>
 	
-  <ItemGroup>
-    <None Update="Assets\82-99 F.M.flac">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\82-99 F.M.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+    <ItemGroup>
+        <None Update="Assets\82-99 F.M.flac">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Assets\04 Madness is My Crown, Fire is My Kingdom.wav">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Assets\SteviaSphere_Dolphin.mp3">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 
 </Project>
