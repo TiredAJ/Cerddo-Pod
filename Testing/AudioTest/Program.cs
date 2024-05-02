@@ -1,47 +1,30 @@
 ﻿using ManagedBass;
-using SharpAudio;
-using SharpAudio.Codec;
 
 namespace AudioTest;
 
 internal class Program
 {
-    private static readonly string FileLoc = $"Assets{Path.DirectorySeparatorChar}SteviaSphere_Dolphin.mp3";
-
+    private static readonly string AssetsLoc = $"Assets{Path.DirectorySeparatorChar}";
+    private static List<string> Files = new();
     static void Main(string[] args)
     {
         Console.Clear();
 
         //Thread.Sleep(3000);
 
+        foreach (var F in Directory.GetFiles(AssetsLoc))
+        {
+            if (Path.GetExtension(F) != ".txt")
+            { Files.Add(Path.GetFileName(F)); }
+        }
+
         //SA();
 
-        MB();
+        foreach (var F in Files)
+        { MB($"{AssetsLoc}{F}"); }
 
         //MDExtract();
     }
-
-    private static void SA()
-    {
-        var ENG = AudioEngine.CreateDefault();
-        var SoundA = new SoundStream(File.OpenRead(FileLoc), ENG);
-
-        //SoundB.Volume = 0.0125f;
-        SoundA.Play();
-        SoundA.Volume = 0.0125f;
-
-        //change to push
-        Thread.Sleep(5000);
-
-        Console.WriteLine($"Pos:{SoundA.Position}");
-        Console.WriteLine("Stopping");
-        SoundA.Stop();
-        Console.WriteLine("Playing");
-
-        SoundA.Play();
-        Console.WriteLine("Should be playing");
-    }
-
 
     private static void MDExtract()
     {
@@ -67,29 +50,30 @@ internal class Program
         //}
     }
 
-    private static void MB()
+    private static void MB(string _Song)
     {
         Bass.Init(-1, 44100, DeviceInitFlags.Stereo, nint.Zero);
 
-        int S = Bass.CreateStream(FileLoc);
+        int S = Bass.CreateStream(_Song);
+
+        Console.WriteLine($"Now playing: {_Song}");
 
         Bass.GlobalMusicVolume = 1;
+        //Bass.GlobalStreamVolume = 6;
 
         if (S != 0)
         { Bass.ChannelPlay(S, true); }
+        else
+        { Console.WriteLine($"Error! {Bass.LastError}"); }
 
         Thread.Sleep(3000);
 
-        Console.WriteLine($"Pause successful: {(Bass.Pause() ? "true" : "false")}");
-        Console.WriteLine(Bass.LastError);
+        //somehow need to get this to block until the stream's finished
 
-        Thread.Sleep(1000);
-        Bass.Start();
-        Console.WriteLine(Bass.LastError);
 
-        do
-        {
 
-        } while (true);
+        //Thread.Sleep(1000);
+        //Bass.Start();
+        //Console.WriteLine(Bass.LastError);
     }
 }

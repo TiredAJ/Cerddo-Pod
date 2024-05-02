@@ -8,10 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.42.0" />
+    <PackageReference Include="ManagedBass" Version="3.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="SharpAudio" Version="1.0.65-beta" />
-    <PackageReference Include="SharpAudio.ALBinding" Version="1.0.65-beta" />
-    <PackageReference Include="SharpAudio.Codec" Version="1.0.65-beta" />
     <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
     <PackageReference Include="z440.atl.core" Version="5.23.0" />
   </ItemGroup>
