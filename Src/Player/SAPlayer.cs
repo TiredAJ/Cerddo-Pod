@@ -1,6 +1,5 @@
-﻿using CSharpFunctionalExtensions;
-using SharpAudio;
-using SharpAudio.Codec;
+﻿using ATL;
+using CSharpFunctionalExtensions;
 using System.Collections.Immutable;
 using Utilities;
 
@@ -8,42 +7,71 @@ namespace Player;
 
 public class SAPlayer
 {
-    #region Member variables
-    public const string METAFILE = ".mpdata";
+    #region Public Members
+    public const string METAFILEEXT = ".mpdata";
     public ImmutableArray<string> SUPPORTEDFILETYPES = [".wav", ".mp3", ".ogg"];
+    public float Volume
+    {
+        get => _Volume;
+        set
+        {
+            _Volume = value;
 
-    public float Volume = 0.0125f;
+            Task.Run(() =>
+            {
+                foreach (var mSD in Tunes)
+                { mSD.Sound.Volume = _Volume; }
+            });
+        }
+    }
 
+    public bool IsInitialised { get => _IsInitialised; }
+    public bool IsPaused { get => _IsPaused; }
+    #endregion
+
+    #region Private Members
     private readonly Maybe<AudioEngine> ENG;
-
-    private List<Maybe<SoundStream>> Tunes = new List<Maybe<SoundStream>>();
-
+    private List<SongData> Tunes;
+    private int CurrentSong = -1;
+    private Maybe<MPData> MetaData;
     private Queue<string> Songs = new();
     private Maybe<IEnumerable<string>> InitSongs;
-    private Maybe<MPData> MetaData;
+    private float _Volume = 0.0125f;
+    private bool _IsInitialised = false, _IsPaused = false;
     #endregion
 
     public SAPlayer()
     { ENG = AudioEngine.CreateDefault(); }
 
+    #region Setup
     public Result LoadFiles(string _Location)
     {
-        var R = FolderChecker(_Location);
+        Result R;
+
+        R = FolderChecker(_Location);
 
         if (R.IsFailure)
         { return R; }
 
-        _LoadFiles(_Location);
+        R = _LoadFiles(_Location);
 
-        LoadSongs();
+        if (R.IsFailure)
+        { return R; }
+
+        R = LoadSongs();
+
+        if (R.IsSuccess)
+        { IsInitialised = true; }
+
+        return R;
     }
 
     private Result FolderChecker(string _Loc)
     {
         if (!Directory.Exists(_Loc))
         { return Result.Failure($"Folder [{_Loc}] does not exist!"); }
-        else if (!Directory.GetFiles(_Loc).Any(X => X.EndsWith(METAFILE)))
-        { return Result.Failure($"No {METAFILE} datafile was present!"); }
+        else if (!Directory.GetFiles(_Loc).Any(X => X.EndsWith(METAFILEEXT)))
+        { return Result.Failure($"No {METAFILEEXT} datafile was present!"); }
         else
         { return Result.Success(); }
     }
@@ -62,7 +90,7 @@ public class SAPlayer
 
             switch (Ext.ToLower())
             {
-                case METAFILE when MetaData.HasNoValue:
+                case METAFILEEXT when MetaData.HasNoValue:
                 {
                     MPData.LoadFromFile(F).Match
                     (
@@ -112,22 +140,68 @@ public class SAPlayer
         if (ENG.HasNoValue)
         { return Result.Failure("ENG is not initialised!"); }
 
-        SoundStream Temp;
+        SongData Temp = new SongData();
 
-        while (Tunes.Count < 3)
+        while (Songs.Count > 0)
         {
-            Temp = new SoundStream(File.OpenRead(Songs.Dequeue()), ENG.Value);
-            Temp.PropertyChanged += Song_PropertyChanged;
-            Temp.Volume = Volume;
+            Stream FSong = File.OpenRead(Songs.Dequeue());
+
+            try
+            { Temp.Sound = new SoundStream(FSong, ENG.Value); }
+            catch (Exception EXC)
+            { return Result.Failure(EXC.Message); }
+
+            Temp.Sound.PropertyChanged += Song_PropertyChanged;
+            Temp.Sound.Volume = Volume;
+
+            try
+            { Temp.CoverImg = Maybe.From(new Track(FSong).EmbeddedPictures.First().PictureData); }
+            catch (Exception EXC)
+            { return Result.Failure(EXC.Message); }
 
             Tunes.Add(Temp);
         }
+
+        return Result.Success();
     }
+    #endregion
+
+    #region Media Controls
+    public void TogglePause()
+    {
+        if (_IsPaused)
+        { Play(); }
+        else
+        { Pause(); }
+    }
+
+    public void Pause()
+    {
+
+    }
+
+    public void Play()
+    { }
+
+    public void Stop()
+    { }
+
+    public void Skip()
+    { }
+
+    public void Rewind()
+    { }
+    #endregion
+
 
     private void Song_PropertyChanged(object? _Sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == "Position")
         { return; }
+
+        SoundStream Sound = _Sender as SoundStream;
+
+        Console.WriteLine(Sound.Volume);
     }
 }
 
@@ -141,4 +215,10 @@ struct MPData
     {
         return Result.Failure<MPData>("Not implemented!");
     }
+}
+
+struct SongData
+{
+    public SoundStream Sound;
+    public Maybe<byte[]> CoverImg;
 }

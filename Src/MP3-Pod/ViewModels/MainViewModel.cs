@@ -1,9 +1,23 @@
-﻿namespace MP3_Pod.ViewModels
+﻿using Player;
+
+namespace MP3_Pod.ViewModels;
+
+public class MainViewModel : ViewModelBase
 {
-    public class MainViewModel : ViewModelBase
-    {
-#pragma warning disable CA1822 // Mark members as static
-        public string Greeting => "Welcome to Avalonia!";
-#pragma warning restore CA1822 // Mark members as static
-    }
+    private SAPlayer SAP = new SAPlayer();
+
+    public MainViewModel()
+    { SAP.LoadFiles("/Assets"); }
+
+    public MainViewModel(string _Loc)
+    { SAP.LoadFiles(_Loc); }
+
+    public void Command_PlayPause()
+    { SAP.to }
+
+    public void Command_Rewind()
+    { }
+
+    public void Command_Skip()
+    { }
 }

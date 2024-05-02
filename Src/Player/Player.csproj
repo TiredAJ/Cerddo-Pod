@@ -13,6 +13,7 @@
     <PackageReference Include="SharpAudio.ALBinding" Version="1.0.65-beta" />
     <PackageReference Include="SharpAudio.Codec" Version="1.0.65-beta" />
     <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
+    <PackageReference Include="z440.atl.core" Version="5.23.0" />
   </ItemGroup>
 
   <ItemGroup>
