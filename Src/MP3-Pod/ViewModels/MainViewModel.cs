@@ -1,6 +1,7 @@
 ﻿using Player;
 using ReactiveUI;
 using System.IO;
+using CSharpFunctionalExtensions;
 
 namespace MP3_Pod.ViewModels;
 

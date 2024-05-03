@@ -223,21 +223,41 @@ public class SAPlayer
 
     public void Play()
     {
+        if (!CheckSongs())
+        { return; }
         Bass.GlobalStreamVolume = _Volume;
         Bass.ChannelPlay(Tunes[CurrentSong].SoundHandle, true);
     }
 
     public void Pause()
-    { Bass.ChannelPause(Tunes[CurrentSong].SoundHandle); }
+    {
+        if (!CheckSongs())
+        { return; }
+        
+        Bass.ChannelPause(Tunes[CurrentSong].SoundHandle); 
+    }
 
     public void Resume()
-    { Bass.ChannelPlay(Tunes[CurrentSong].SoundHandle, false); }
+    {
+        if (!CheckSongs())
+        { return; }
+        
+        Bass.ChannelPlay(Tunes[CurrentSong].SoundHandle, false); 
+    }
 
     public void Stop()
-    { Bass.ChannelStop(Tunes[CurrentSong].SoundHandle); }
+    {
+        if (!CheckSongs())
+        { return; }
+
+        Bass.ChannelStop(Tunes[CurrentSong].SoundHandle); 
+    }
 
     public void Skip()
     {
+        if (!CheckSongs())
+        { return; }
+
         Stop();
         CurrentSong++;
         Play();
@@ -245,7 +265,9 @@ public class SAPlayer
 
     public void Rewind()
     {
-        if (Elapsed(Tunes[CurrentSong].SoundHandle) < 25)
+        if (!CheckSongs())
+        { return; }
+        else if (Elapsed(Tunes[CurrentSong].SoundHandle) < 25)
         {
             Stop();
             CurrentSong--;
@@ -260,6 +282,8 @@ public class SAPlayer
     private double Elapsed(int _Handle)
         => Bass.ChannelBytes2Seconds(_Handle, Bass.ChannelGetPosition(_Handle));
 
+    private bool CheckSongs()
+        => Tunes.Count > 0 ? true : false;
 
     #endregion
 }
