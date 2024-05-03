@@ -12,7 +12,7 @@ public class SAPlayer
 {
     #region Public Members
     public const string METAFILEEXT = ".mpdata";
-    public ImmutableArray<string> SUPPORTEDFILETYPES = [".wav", ".mp3", ".ogg", ".aiff", ".mp2", ".mp1"];
+    public ImmutableArray<string> SUPPORTEDFILETYPES = [".wav", ".mp3", ".ogg", ".aiff", ".mp2", ".mp1", ".flac"];
     public int Volume
     {
         get => _Volume;
@@ -21,20 +21,35 @@ public class SAPlayer
             _Volume = value;
 
             Bass.GlobalStreamVolume = _Volume;
+
+            Debug.WriteLine($"Vol: {_Volume}");
         }
     }
-
     public bool IsInitialised { get; private set; } = false;
     public bool IsPaused { get; private set; } = false;
+    public SongData NowPlaying { get => Tunes[CurrentSong]; }
     #endregion
 
     #region Private Members
-    private List<SongData> Tunes;
-    private int CurrentSong = -1;
+    private List<SongData> Tunes = new();
+    private int CurrentSong
+    {
+        get => _CurrentSong;
+        set
+        {
+            if (value >= Tunes.Count)
+            { _CurrentSong = 0; }
+            else if (value < 0)
+            { _CurrentSong = Tunes.Count - 1; }
+            else
+            { _CurrentSong = value; }
+        }
+    }
+    private int _CurrentSong = 0;
 
     private Maybe<MPData> MetaData;
     private string FolderLoc = "";
-    private int _Volume = 800;
+    public int _Volume = 200;
     #endregion
 
     #region Init
@@ -106,16 +121,16 @@ public class SAPlayer
             {
                 case METAFILEEXT when MetaData.HasNoValue:
                 {
-                    MPData.LoadFromFile(F).Match
-                    (
-                        Val => MetaData = Val,
-                        ErStr =>
-                        {
-                            Logger.PushLog(ErStr);
-                            ErMsg += $"[{ErStr}] ";
-                            Errors = true;
-                        }
-                    );
+                    //MPData.LoadFromFile(F).Match
+                    //(
+                    //    Val => MetaData = Val,
+                    //    ErStr =>
+                    //    {
+                    //        Logger.PushLog(ErStr);
+                    //        ErMsg += $"[{ErStr}] ";
+                    //        Errors = true;
+                    //    }
+                    //);
 
                     break;
                 }
@@ -124,17 +139,19 @@ public class SAPlayer
                     if (SUPPORTEDFILETYPES.Contains(Ext))
                     { _Songs.Enqueue(F); }
                     else
-                    {
-                        Errors = true;
-                        Logger.PushLog($"Song {Path.GetFileName(F)} is of incompatible file type");
-                    }
+                    { Logger.PushLog($"Song {Path.GetFileName(F)} is of incompatible file type"); }
                     break;
                 }
             }
         }
 
         if (_Songs.Count > 0)
-        { ErMsg += LoadSongs(_Songs).Error; }
+        {
+            Result R = LoadSongs(_Songs);
+
+            if (R.IsFailure)
+            { ErMsg += R.Error; }
+        }
         else
         {
             Errors = true;
@@ -169,7 +186,9 @@ public class SAPlayer
             {
                 Track TSong = new Track(Song);
 
-                Temp.CoverImg = Maybe.From(TSong.EmbeddedPictures.First().PictureData);
+                if (TSong.EmbeddedPictures.Count > 0)
+                { Temp.CoverImg = Maybe.From(TSong.EmbeddedPictures.First().PictureData); }
+
                 Temp.ArtistName = TSong.Artist;
                 Temp.SongName = TSong.Title is not null ? TSong.Title : Path.GetFileNameWithoutExtension(Song);
             }
@@ -184,16 +203,29 @@ public class SAPlayer
     #endregion
 
     #region Media Controls
+    /// <summary>
+    /// Starts if stopped, resumes if paused or pauses if playing
+    /// </summary>
     public void TogglePause()
     {
-        if (IsPaused)
-        { Resume(); }
-        else
-        { Pause(); }
+        switch (Bass.ChannelIsActive(Tunes[CurrentSong].SoundHandle))
+        {
+            case PlaybackState.Playing:
+            { Pause(); break; }
+            case PlaybackState.Paused:
+            { Resume(); break; }
+            case PlaybackState.Stopped:
+            case PlaybackState.Stalled:
+            default:
+            { Play(); break; }
+        }
     }
 
     public void Play()
-    { Bass.ChannelPlay(Tunes[CurrentSong].SoundHandle, true); }
+    {
+        Bass.GlobalStreamVolume = _Volume;
+        Bass.ChannelPlay(Tunes[CurrentSong].SoundHandle, true);
+    }
 
     public void Pause()
     { Bass.ChannelPause(Tunes[CurrentSong].SoundHandle); }
@@ -213,7 +245,7 @@ public class SAPlayer
 
     public void Rewind()
     {
-        if (Elapsed(Tunes[CurrentSong].SoundHandle) < (Tunes[CurrentSong].Duration.TotalSeconds / 10))
+        if (Elapsed(Tunes[CurrentSong].SoundHandle) < 25)
         {
             Stop();
             CurrentSong--;
@@ -244,7 +276,7 @@ struct MPData
     }
 }
 
-struct SongData
+public struct SongData
 {
     public int SoundHandle;
     public string SongName, ArtistName;
