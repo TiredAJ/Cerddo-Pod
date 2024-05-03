@@ -1,6 +1,9 @@
 ﻿using ATL;
 using CSharpFunctionalExtensions;
+using ManagedBass;
+using Player.Utils;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using Utilities;
 
 namespace Player;
@@ -9,41 +12,57 @@ public class SAPlayer
 {
     #region Public Members
     public const string METAFILEEXT = ".mpdata";
-    public ImmutableArray<string> SUPPORTEDFILETYPES = [".wav", ".mp3", ".ogg"];
-    public float Volume
+    public ImmutableArray<string> SUPPORTEDFILETYPES = [".wav", ".mp3", ".ogg", ".aiff", ".mp2", ".mp1"];
+    public int Volume
     {
         get => _Volume;
         set
         {
             _Volume = value;
 
-            Task.Run(() =>
-            {
-                foreach (var mSD in Tunes)
-                { mSD.Sound.Volume = _Volume; }
-            });
+            Bass.GlobalStreamVolume = _Volume;
         }
     }
 
-    public bool IsInitialised { get => _IsInitialised; }
-    public bool IsPaused { get => _IsPaused; }
+    public bool IsInitialised { get; private set; } = false;
+    public bool IsPaused { get; private set; } = false;
     #endregion
 
     #region Private Members
-    private readonly Maybe<AudioEngine> ENG;
     private List<SongData> Tunes;
     private int CurrentSong = -1;
+
     private Maybe<MPData> MetaData;
-    private Queue<string> Songs = new();
-    private Maybe<IEnumerable<string>> InitSongs;
-    private float _Volume = 0.0125f;
-    private bool _IsInitialised = false, _IsPaused = false;
+    private string FolderLoc = "";
+    private int _Volume = 800;
     #endregion
 
+    #region Init
     public SAPlayer()
-    { ENG = AudioEngine.CreateDefault(); }
+    { _Init(); }
+
+    public SAPlayer(string _Loc)
+    {
+        FolderLoc = _Loc;
+        _Init();
+    }
+
+    private void _Init()
+    {
+        if (!IsInitialised)
+        {
+            IsInitialised = Bass.Init(-1, 44100, DeviceInitFlags.Stereo);
+
+            if (!IsInitialised)
+            { Debug.WriteLine($"Bass couldn't initialise! {Bass.LastError}"); }
+        }
+    }
+    #endregion
 
     #region Setup
+    public Result LoadFiles()
+    { return LoadFiles(FolderLoc); }
+
     public Result LoadFiles(string _Location)
     {
         Result R;
@@ -57,11 +76,6 @@ public class SAPlayer
 
         if (R.IsFailure)
         { return R; }
-
-        R = LoadSongs();
-
-        if (R.IsSuccess)
-        { IsInitialised = true; }
 
         return R;
     }
@@ -79,7 +93,7 @@ public class SAPlayer
     private Result _LoadFiles(string _Loc)
     {
         var Files = Directory.GetFiles(_Loc);
-        List<string> _Songs = new();
+        Queue<string> _Songs = new();
         bool Errors = false;
 
         string Ext = string.Empty, ErMsg = string.Empty;
@@ -108,12 +122,11 @@ public class SAPlayer
                 default:
                 {
                     if (SUPPORTEDFILETYPES.Contains(Ext))
-                    { _Songs.Add(F); }
+                    { _Songs.Enqueue(F); }
                     else
                     {
                         Errors = true;
                         Logger.PushLog($"Song {Path.GetFileName(F)} is of incompatible file type");
-                        ErMsg += $"Song {Path.GetFileName(F)} is of incompatible file type";
                     }
                     break;
                 }
@@ -121,41 +134,45 @@ public class SAPlayer
         }
 
         if (_Songs.Count > 0)
-        {
-            InitSongs = _Songs;
-            Songs = new Queue<string>(InitSongs.Value);
-        }
+        { ErMsg += LoadSongs(_Songs).Error; }
         else
         {
             Errors = true;
             ErMsg += "[There are no (suitable) songs in folder!]";
         }
 
-
         return Errors ? Result.Failure(ErMsg) : Result.Success();
     }
 
-    private Result LoadSongs()
+    private Result LoadSongs(Queue<string> _Songs)
     {
-        if (ENG.HasNoValue)
+        if (!IsInitialised)
         { return Result.Failure("ENG is not initialised!"); }
 
         SongData Temp = new SongData();
 
-        while (Songs.Count > 0)
+        while (_Songs.Count > 0)
         {
-            Stream FSong = File.OpenRead(Songs.Dequeue());
+            string Song = _Songs.Dequeue();
 
             try
-            { Temp.Sound = new SoundStream(FSong, ENG.Value); }
+            {
+                Temp.SoundHandle = Bass.CreateStream(Song);
+                Temp.Duration = Bass.ChannelBytes2Seconds(Temp.SoundHandle,
+                            Bass.ChannelGetLength(Temp.SoundHandle))
+                                    .DblToTS();
+            }
             catch (Exception EXC)
             { return Result.Failure(EXC.Message); }
 
-            Temp.Sound.PropertyChanged += Song_PropertyChanged;
-            Temp.Sound.Volume = Volume;
-
             try
-            { Temp.CoverImg = Maybe.From(new Track(FSong).EmbeddedPictures.First().PictureData); }
+            {
+                Track TSong = new Track(Song);
+
+                Temp.CoverImg = Maybe.From(TSong.EmbeddedPictures.First().PictureData);
+                Temp.ArtistName = TSong.Artist;
+                Temp.SongName = TSong.Title is not null ? TSong.Title : Path.GetFileNameWithoutExtension(Song);
+            }
             catch (Exception EXC)
             { return Result.Failure(EXC.Message); }
 
@@ -169,40 +186,50 @@ public class SAPlayer
     #region Media Controls
     public void TogglePause()
     {
-        if (_IsPaused)
-        { Play(); }
+        if (IsPaused)
+        { Resume(); }
         else
         { Pause(); }
     }
 
-    public void Pause()
-    {
-
-    }
-
     public void Play()
-    { }
+    { Bass.ChannelPlay(Tunes[CurrentSong].SoundHandle, true); }
+
+    public void Pause()
+    { Bass.ChannelPause(Tunes[CurrentSong].SoundHandle); }
+
+    public void Resume()
+    { Bass.ChannelPlay(Tunes[CurrentSong].SoundHandle, false); }
 
     public void Stop()
-    { }
+    { Bass.ChannelStop(Tunes[CurrentSong].SoundHandle); }
 
     public void Skip()
-    { }
+    {
+        Stop();
+        CurrentSong++;
+        Play();
+    }
 
     public void Rewind()
-    { }
+    {
+        if (Elapsed(Tunes[CurrentSong].SoundHandle) < (Tunes[CurrentSong].Duration.TotalSeconds / 10))
+        {
+            Stop();
+            CurrentSong--;
+            Play();
+        }
+        else
+        { Bass.ChannelSetPosition(Tunes[CurrentSong].SoundHandle, 0); }
+    }
     #endregion
 
+    #region Misc
+    private double Elapsed(int _Handle)
+        => Bass.ChannelBytes2Seconds(_Handle, Bass.ChannelGetPosition(_Handle));
 
-    private void Song_PropertyChanged(object? _Sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == "Position")
-        { return; }
 
-        SoundStream Sound = _Sender as SoundStream;
-
-        Console.WriteLine(Sound.Volume);
-    }
+    #endregion
 }
 
 struct MPData
@@ -219,6 +246,8 @@ struct MPData
 
 struct SongData
 {
-    public SoundStream Sound;
+    public int SoundHandle;
+    public string SongName, ArtistName;
     public Maybe<byte[]> CoverImg;
+    public TimeSpan Duration;
 }

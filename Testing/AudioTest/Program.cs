@@ -6,9 +6,14 @@ internal class Program
 {
     private static readonly string AssetsLoc = $"Assets{Path.DirectorySeparatorChar}";
     private static List<string> Files = new();
+    private static Random rng = new Random(DateTime.Now.Millisecond);
+
     static void Main(string[] args)
     {
         Console.Clear();
+        Console.CursorVisible = false;
+
+        Bass.Init(-1, 44100, DeviceInitFlags.Stereo, nint.Zero);
 
         //Thread.Sleep(3000);
 
@@ -20,7 +25,7 @@ internal class Program
 
         //SA();
 
-        foreach (var F in Files)
+        foreach (var F in Files.OrderBy(_ => rng.Next()))
         { MB($"{AssetsLoc}{F}"); }
 
         //MDExtract();
@@ -52,28 +57,33 @@ internal class Program
 
     private static void MB(string _Song)
     {
-        Bass.Init(-1, 44100, DeviceInitFlags.Stereo, nint.Zero);
+        Console.SetCursorPosition(0, 0);
 
         int S = Bass.CreateStream(_Song);
 
         Console.WriteLine($"Now playing: {_Song}");
 
-        Bass.GlobalMusicVolume = 1;
-        //Bass.GlobalStreamVolume = 6;
+        //Bass.GlobalMusicVolume = 1;
+        Bass.GlobalStreamVolume = 600;
 
         if (S != 0)
         { Bass.ChannelPlay(S, true); }
         else
         { Console.WriteLine($"Error! {Bass.LastError}"); }
 
-        Thread.Sleep(3000);
+        Thread.Sleep(8000);
 
-        //somehow need to get this to block until the stream's finished
+        //works as expected
+        Bass.ChannelSetPosition(S, 0);
 
+        ChannelInfo CI;
+        double SLength = Bass.ChannelBytes2Seconds(S, Bass.ChannelGetLength(S));
 
-
-        //Thread.Sleep(1000);
-        //Bass.Start();
-        //Console.WriteLine(Bass.LastError);
+        while (SLength > Bass.ChannelBytes2Seconds(S, Bass.ChannelGetPosition(S)))
+        {
+            Bass.ChannelGetInfo(S, out CI);
+            Console.SetCursorPosition(0, 1);
+            Console.WriteLine($"{SLength.TimeDisplay()} : {Bass.ChannelBytes2Seconds(S, Bass.ChannelGetPosition(S)).TimeDisplay()}    ");
+        }
     }
 }

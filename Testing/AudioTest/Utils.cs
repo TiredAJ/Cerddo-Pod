@@ -1,25 +1,12 @@
-//public unsafe class SilkPlayer
-//{
-//    short numChannels = -1;
-//    int sampleRate = -1;
-//    int byteRate = -1;
-//    short blockAlign = -1;
-//    short bitsPerSample = -1;
-//    BufferFormat format = 0;
+namespace AudioTest;
 
-//    ALContext ALC;
-//    AL ALApi;
+public static class Extensions
+{
+    public static string TimeDisplay(this double _Val)
+    {
+        if (_Val >= TimeSpan.MaxValue.TotalSeconds)
+        { return "-00:-00"; }
 
-//    public unsafe SilkPlayer()
-//    {
-
-
-
-//        ALC = ALContext.GetApi();
-
-//        ALApi = AL.GetApi();
-
-//        var Device = ALC.OpenDevice("");
-//    }
-//}
-
+        return TimeSpan.FromSeconds(_Val).ToString("mm\\:ss");
+    }
+}
