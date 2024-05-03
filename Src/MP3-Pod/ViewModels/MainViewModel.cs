@@ -23,7 +23,7 @@ public class MainViewModel : ViewModelBase
     }
 
     public MainViewModel()
-    { SAP.LoadFiles($"Assets{Path.DirectorySeparatorChar}"); }
+    { SAP.LoadFiles($"/run/media/tiredaj/AJStore/GitHub/MP3-Pod/Src/MP3-Pod.Desktop/bin/Debug/net8.0/Assets"); }
 
     public MainViewModel(string _Loc)
     { SAP.LoadFiles(_Loc); }

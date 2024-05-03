@@ -5,6 +5,7 @@ using Player.Utils;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using Utilities;
+using System.Reflection;
 
 namespace Player;
 
@@ -97,6 +98,9 @@ public class SAPlayer
 
     private Result FolderChecker(string _Loc)
     {
+        //Debug.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+        //Debug.WriteLine(new DirectoryInfo(_Loc).ToString());
+
         if (!Directory.Exists(_Loc))
         { return Result.Failure($"Folder [{_Loc}] does not exist!"); }
         else if (!Directory.GetFiles(_Loc).Any(X => X.EndsWith(METAFILEEXT)))
@@ -110,6 +114,8 @@ public class SAPlayer
         var Files = Directory.GetFiles(_Loc);
         Queue<string> _Songs = new();
         bool Errors = false;
+
+        Debug.WriteLine($"Files: {Files.Count()}");
 
         string Ext = string.Empty, ErMsg = string.Empty;
 
@@ -175,6 +181,7 @@ public class SAPlayer
             try
             {
                 Temp.SoundHandle = Bass.CreateStream(Song);
+                Console.WriteLine($"Bass Err: {Bass.LastError}");
                 Temp.Duration = Bass.ChannelBytes2Seconds(Temp.SoundHandle,
                             Bass.ChannelGetLength(Temp.SoundHandle))
                                     .DblToTS();
@@ -208,6 +215,9 @@ public class SAPlayer
     /// </summary>
     public void TogglePause()
     {
+        if (!CheckSongs())
+        { return; }
+
         switch (Bass.ChannelIsActive(Tunes[CurrentSong].SoundHandle))
         {
             case PlaybackState.Playing:
