@@ -10,11 +10,6 @@
 
   <ItemGroup>
     <PackageReference Include="ManagedBass" Version="3.1.1" />
-    <PackageReference Include="MetadataExtractor" Version="2.9.0-rc2" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="SharpAudio" Version="1.0.65-beta" />
-    <PackageReference Include="SharpAudio.ALBinding" Version="1.0.65-beta" />
-    <PackageReference Include="SharpAudio.Codec" Version="1.0.65-beta" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.4" />
     <PackageReference Include="z440.atl.core" Version="5.23.0" />
   </ItemGroup>

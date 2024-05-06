@@ -1,4 +1,5 @@
 ﻿using ManagedBass;
+using System.Diagnostics;
 
 namespace AudioTest;
 
@@ -7,6 +8,8 @@ internal class Program
     private static readonly string AssetsLoc = $"Assets{Path.DirectorySeparatorChar}";
     private static List<string> Files = new();
     private static Random rng = new Random(DateTime.Now.Millisecond);
+    private static SyncProcedure Syncer = new(EndSync);
+    private static bool EndOfSong = false;
 
     static void Main(string[] args)
     {
@@ -61,6 +64,8 @@ internal class Program
 
         int S = Bass.CreateStream(_Song);
 
+        Bass.ChannelSetSync(S, SyncFlags.End | SyncFlags.Mixtime, 0, Syncer);
+
         Console.WriteLine($"Now playing: {_Song}");
 
         //Bass.GlobalMusicVolume = 1;
@@ -71,10 +76,10 @@ internal class Program
         else
         { Console.WriteLine($"Error! {Bass.LastError}"); }
 
-        Thread.Sleep(8000);
+        //Thread.Sleep(8000);
 
         //works as expected
-        Bass.ChannelSetPosition(S, 0);
+        //Bass.ChannelSetPosition(S, 0);
 
         ChannelInfo CI;
         double SLength = Bass.ChannelBytes2Seconds(S, Bass.ChannelGetLength(S));
@@ -86,4 +91,7 @@ internal class Program
             Console.WriteLine($"{SLength.TimeDisplay()} : {Bass.ChannelBytes2Seconds(S, Bass.ChannelGetPosition(S)).TimeDisplay()}    ");
         }
     }
+
+    private static void EndSync(int _Handle, int _Chnl, int _Data, IntPtr _Usr)
+    { Debug.WriteLine("End of stream!"); }
 }
