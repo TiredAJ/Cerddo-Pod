@@ -26,24 +26,21 @@ internal class Program
 
         Bass.Init(-1, 44100, DeviceInitFlags.Stereo, nint.Zero);
 
-        //Thread.Sleep(3000);
-
         foreach (var F in Directory.GetFiles(AssetsLoc))
         {
             if (Path.GetExtension(F) != ".txt")
             { Files.Add(Path.GetFileName(F)); }
         }
 
-        //SA();
-
         foreach (var F in Files.OrderBy(_ => rng.Next()))
         { MB($"{AssetsLoc}{F}"); }
 
-        //MDExtract();
+        CleanupImgAssets();
     }
 
     private static string? MDExtract(string _Song)
     {
+
         //Albulm cover \/
         CurTrack = new Track(_Song);
 
@@ -51,12 +48,20 @@ internal class Program
 
         if (CurTrack.EmbeddedPictures.Count > 0)
         {
+            string IADir = "ImgAssets";
+            string FileName = string.Empty;
+
+            if (!Directory.Exists(IADir))
+            { Directory.CreateDirectory(IADir); }
+
             var First = CurTrack.EmbeddedPictures.First();
 
-            using (var Img = Image.Load(new MemoryStream(First.PictureData)))
-            { Img.SaveAsJpeg($"{First.PictureHash}.jpg"); }
+            FileName = $"{IADir}{Path.DirectorySeparatorChar}{First.PictureHash}.jpg";
 
-            return $"{First.PictureHash}.jpg";
+            using (var Img = Image.Load(new MemoryStream(First.PictureData)))
+            { Img.SaveAsJpeg(FileName); }
+
+            return FileName;
         }
         else
         { return default; }
@@ -141,6 +146,7 @@ internal class Program
             {
                 ImageView.Kill();
                 ImageView.Close();
+                ImageView = null;
             }
 
             try
@@ -160,5 +166,11 @@ internal class Program
             catch (Exception EXC)
             { Debug.WriteLine(EXC.Message); }
         });
+    }
+
+    private static void CleanupImgAssets()
+    {
+        if (Directory.Exists("ImgAssets"))
+        { Directory.Delete("ImgAssets", true); }
     }
 }
