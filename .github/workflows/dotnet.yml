@@ -38,5 +38,4 @@ jobs:
       working-directory: UI-Avalonia
     - name: Build
       run: dotnet build --no-restore
-      working-directory: UI-Avalonia      
-working-directory: UI-Avalonia
+      working-directory: UI-Avalonia
