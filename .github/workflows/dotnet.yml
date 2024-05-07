@@ -13,8 +13,8 @@ jobs:
   LinuxTest:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
     - working-directory: UI-Avalonia
+    - uses: actions/checkout@v4
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
@@ -27,8 +27,8 @@ jobs:
   WindowsTest:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
     - working-directory: UI-Avalonia
+    - uses: actions/checkout@v4
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
