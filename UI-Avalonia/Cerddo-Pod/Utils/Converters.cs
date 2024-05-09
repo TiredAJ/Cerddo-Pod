@@ -1,6 +1,6 @@
 ﻿using Avalonia.Data.Converters;
 
-namespace MP3_Pod.Utils;
+namespace Cerddo_Pod.Utils;
 
 public static class ConvertersUtils
 {

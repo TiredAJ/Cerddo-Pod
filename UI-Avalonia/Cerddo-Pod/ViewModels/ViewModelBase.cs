@@ -1,8 +1,7 @@
 ﻿using ReactiveUI;
 
-namespace MP3_Pod.ViewModels
+namespace Cerddo_Pod.ViewModels;
+
+public class ViewModelBase : ReactiveObject
 {
-    public class ViewModelBase : ReactiveObject
-    {
-    }
 }

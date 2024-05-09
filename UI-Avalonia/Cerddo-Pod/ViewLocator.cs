@@ -1,31 +1,26 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using MP3_Pod.ViewModels;
+using Cerddo_Pod.ViewModels;
 using System;
 
-namespace MP3_Pod
+namespace Cerddo_Pod;
+
+public class ViewLocator : IDataTemplate
 {
-    public class ViewLocator : IDataTemplate
+    public Control? Build(object? data)
     {
-        public Control? Build(object? data)
-        {
-            if (data is null)
-                return null;
+        if (data is null)
+            return null;
 
-            var name = data.GetType().FullName!.Replace("ViewModel", "View", StringComparison.Ordinal);
-            var type = Type.GetType(name);
+        var name = data.GetType().FullName!.Replace("ViewModel", "View", StringComparison.Ordinal);
+        var type = Type.GetType(name);
 
-            if (type != null)
-            {
-                return (Control)Activator.CreateInstance(type)!;
-            }
+        if (type != null)
+        { return (Control)Activator.CreateInstance(type)!; }
 
-            return new TextBlock { Text = "Not Found: " + name };
-        }
-
-        public bool Match(object? data)
-        {
-            return data is ViewModelBase;
-        }
+        return new TextBlock { Text = "Not Found: " + name };
     }
+
+    public bool Match(object? data)
+    { return data is ViewModelBase; }
 }

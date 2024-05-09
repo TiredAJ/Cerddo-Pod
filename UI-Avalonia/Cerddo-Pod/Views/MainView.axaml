@@ -2,10 +2,10 @@
             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-            xmlns:vm="clr-namespace:MP3_Pod.ViewModels"
-			xmlns:Ut="clr-namespace:MP3_Pod.Utils"
+            xmlns:vm="clr-namespace:Cerddo_Pod.ViewModels"
+			xmlns:Ut="clr-namespace:Cerddo_Pod.Utils"
             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-            x:Class="MP3_Pod.Views.MainView"
+            x:Class="Cerddo_Pod.Views.MainView"
             x:DataType="vm:MainViewModel"
 			x:CompileBindings="True"
 			Background="Gray">
@@ -28,7 +28,7 @@
 			</StackPanel>
 		</StackPanel>
 		<Slider Orientation="Vertical" Height="150" Maximum="1500" Minimum="0"
-			Value="{Binding Volume}" x:Name="sldr_Volume"/>
+			Value="{Binding SAP.Volume}" x:Name="sldr_Volume"/>
 		<TextBlock Text="{Binding #sldr_Volume.Value, Converter={x:Static Ut:ConvertersUtils.PercentageConverter}}" HorizontalAlignment="Center" 
 			VerticalAlignment="Center" Width="35" TextAlignment="Center"/>
 	</StackPanel>

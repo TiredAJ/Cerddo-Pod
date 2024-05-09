@@ -1,12 +1,11 @@
 using Avalonia.Controls;
 
-namespace MP3_Pod.Views
+namespace Cerddo_Pod.Views;
+
+public partial class MainView : UserControl
 {
-    public partial class MainView : UserControl
+    public MainView()
     {
-        public MainView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

@@ -2,14 +2,14 @@
 using CSharpFunctionalExtensions;
 using ManagedBass;
 using Player.Utils;
+using ReactiveUI;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using Utilities;
-using System.Reflection;
 
 namespace Player;
 
-public class SAPlayer
+public class SAPlayer : ReactiveObject, IDisposable
 {
     #region Public Members
     public const string METAFILEEXT = ".mpdata";
@@ -23,7 +23,9 @@ public class SAPlayer
 
             Bass.GlobalStreamVolume = _Volume;
 
-            Debug.WriteLine($"Vol: {_Volume}");
+            //Debug.WriteLine($"Vol: {_Volume}");
+
+            this.RaiseAndSetIfChanged(ref _Volume, value);
         }
     }
     public bool IsInitialised { get; private set; } = false;
@@ -32,11 +34,11 @@ public class SAPlayer
     #endregion
 
     #region Private Members
-    private List<SongData> Tunes = new();
-    private int CurrentSong
+    private List<SongData> Tunes = [];
+    public int CurrentSong
     {
         get => _CurrentSong;
-        set
+        private set
         {
             if (value >= Tunes.Count)
             { _CurrentSong = 0; }
@@ -51,6 +53,7 @@ public class SAPlayer
     private Maybe<MPData> MetaData;
     private string FolderLoc = "";
     public int _Volume = 200;
+    private bool DisposedValue;
     #endregion
 
     #region Init
@@ -70,7 +73,9 @@ public class SAPlayer
             IsInitialised = Bass.Init(-1, 44100, DeviceInitFlags.Stereo);
 
             if (!IsInitialised)
-            { Debug.WriteLine($"Bass couldn't initialise! {Bass.LastError}"); }
+            { Logger.Log($"Bass couldn't initialise! {Bass.LastError}"); }
+
+            DisposedValue = false;
         }
     }
     #endregion
@@ -81,6 +86,9 @@ public class SAPlayer
 
     public Result LoadFiles(string _Location)
     {
+        if (DisposedValue)
+        { return Logger.LogResult(DefMsg.BassDispose); }
+
         Result R;
 
         R = FolderChecker(_Location);
@@ -96,28 +104,27 @@ public class SAPlayer
         return R;
     }
 
-    private Result FolderChecker(string _Loc)
+    private static Result FolderChecker(string _Loc)
     {
-        //Debug.WriteLine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-        //Debug.WriteLine(new DirectoryInfo(_Loc).ToString());
-
+        //https://learn.microsoft.com/en-us/dotnet/core/extensions/file-globbing#get-all-matching-files
         if (!Directory.Exists(_Loc))
-        { return Result.Failure($"Folder [{_Loc}] does not exist!"); }
+        { return Logger.LogResult($"Folder \"{_Loc}\" does not exist!"); }
         else if (!Directory.GetFiles(_Loc).Any(X => X.EndsWith(METAFILEEXT)))
-        { return Result.Failure($"No {METAFILEEXT} datafile was present!"); }
+        { return Logger.LogResult($"No {METAFILEEXT} datafile was present!"); }
         else
         { return Result.Success(); }
     }
 
     private Result _LoadFiles(string _Loc)
     {
+        //https://learn.microsoft.com/en-us/dotnet/core/extensions/file-globbing#get-all-matching-files
         var Files = Directory.GetFiles(_Loc);
         Queue<string> _Songs = new();
         bool Errors = false;
 
-        Debug.WriteLine($"Files: {Files.Count()}");
+        Debug.WriteLine($"Files: {Files.Length}");
 
-        string Ext = string.Empty, ErMsg = string.Empty;
+        string Ext, ErMsg = string.Empty;
 
         foreach (var F in Files)
         {
@@ -132,7 +139,7 @@ public class SAPlayer
                     //    Val => MetaData = Val,
                     //    ErStr =>
                     //    {
-                    //        Logger.PushLog(ErStr);
+                    //        Logger.Log(ErStr);
                     //        ErMsg += $"[{ErStr}] ";
                     //        Errors = true;
                     //    }
@@ -145,7 +152,7 @@ public class SAPlayer
                     if (SUPPORTEDFILETYPES.Contains(Ext))
                     { _Songs.Enqueue(F); }
                     else
-                    { Logger.PushLog($"Song {Path.GetFileName(F)} is of incompatible file type"); }
+                    { Logger.Log($"Song \"{Path.GetFileName(F)}\" is of incompatible file type"); }
                     break;
                 }
             }
@@ -164,15 +171,15 @@ public class SAPlayer
             ErMsg += "[There are no (suitable) songs in folder!]";
         }
 
-        return Errors ? Result.Failure(ErMsg) : Result.Success();
+        return Errors ? Logger.LogResult(ErMsg) : Result.Success();
     }
 
     private Result LoadSongs(Queue<string> _Songs)
     {
         if (!IsInitialised)
-        { return Result.Failure("ENG is not initialised!"); }
+        { return Logger.LogResult(DefMsg.BassNoInit); }
 
-        SongData Temp = new SongData();
+        SongData Temp = new();
 
         while (_Songs.Count > 0)
         {
@@ -181,17 +188,16 @@ public class SAPlayer
             try
             {
                 Temp.SoundHandle = Bass.CreateStream(Song);
-                Console.WriteLine($"Bass Err: {Bass.LastError}");
                 Temp.Duration = Bass.ChannelBytes2Seconds(Temp.SoundHandle,
                             Bass.ChannelGetLength(Temp.SoundHandle))
                                     .DblToTS();
             }
             catch (Exception EXC)
-            { return Result.Failure(EXC.Message); }
+            { return Logger.LogResult(EXC.Message); }
 
             try
             {
-                Track TSong = new Track(Song);
+                Track TSong = new(Song);
 
                 if (TSong.EmbeddedPictures.Count > 0)
                 { Temp.CoverImg = Maybe.From(TSong.EmbeddedPictures.First().PictureData); }
@@ -200,7 +206,7 @@ public class SAPlayer
                 Temp.SongName = TSong.Title is not null ? TSong.Title : Path.GetFileNameWithoutExtension(Song);
             }
             catch (Exception EXC)
-            { return Result.Failure(EXC.Message); }
+            { return Logger.LogResult(EXC.Message); }
 
             Tunes.Add(Temp);
         }
@@ -215,7 +221,7 @@ public class SAPlayer
     /// </summary>
     public void TogglePause()
     {
-        if (!CheckSongs())
+        if (!CheckPlay())
         { return; }
 
         switch (Bass.ChannelIsActive(Tunes[CurrentSong].SoundHandle))
@@ -233,7 +239,7 @@ public class SAPlayer
 
     public void Play()
     {
-        if (!CheckSongs())
+        if (!CheckPlay())
         { return; }
         Bass.GlobalStreamVolume = _Volume;
         Bass.ChannelPlay(Tunes[CurrentSong].SoundHandle, true);
@@ -241,31 +247,31 @@ public class SAPlayer
 
     public void Pause()
     {
-        if (!CheckSongs())
+        if (!CheckPlay())
         { return; }
-        
-        Bass.ChannelPause(Tunes[CurrentSong].SoundHandle); 
+
+        Bass.ChannelPause(Tunes[CurrentSong].SoundHandle);
     }
 
     public void Resume()
     {
-        if (!CheckSongs())
+        if (!CheckPlay())
         { return; }
-        
-        Bass.ChannelPlay(Tunes[CurrentSong].SoundHandle, false); 
+
+        Bass.ChannelPlay(Tunes[CurrentSong].SoundHandle, false);
     }
 
     public void Stop()
     {
-        if (!CheckSongs())
+        if (!CheckPlay())
         { return; }
 
-        Bass.ChannelStop(Tunes[CurrentSong].SoundHandle); 
+        Bass.ChannelStop(Tunes[CurrentSong].SoundHandle);
     }
 
     public void Skip()
     {
-        if (!CheckSongs())
+        if (!CheckPlay())
         { return; }
 
         Stop();
@@ -275,7 +281,7 @@ public class SAPlayer
 
     public void Rewind()
     {
-        if (!CheckSongs())
+        if (!CheckPlay())
         { return; }
         else if (Elapsed(Tunes[CurrentSong].SoundHandle) < 25)
         {
@@ -289,12 +295,45 @@ public class SAPlayer
     #endregion
 
     #region Misc
-    private double Elapsed(int _Handle)
+    private static double Elapsed(int _Handle)
         => Bass.ChannelBytes2Seconds(_Handle, Bass.ChannelGetPosition(_Handle));
 
-    private bool CheckSongs()
-        => Tunes.Count > 0 ? true : false;
+    private bool CheckPlay()
+    {
+        if (DisposedValue)
+        { Logger.Log(DefMsg.BassDispose); return false; }
+        else if (Tunes.Count == 0)
+        { Logger.Log(DefMsg.TuneCount); return false; }
+        else
+        { return true; }
+    }
+    #endregion
 
+    #region Disposal
+    protected virtual void Dispose(bool _Disposing)
+    {
+        if (!DisposedValue)
+        {
+            if (_Disposing)
+            {
+                foreach (var SD in Tunes)
+                { Bass.StreamFree(SD.SoundHandle); }
+
+                Bass.Free();
+            }
+
+            DisposedValue = true;
+        }
+    }
+
+    ~SAPlayer()
+    { Dispose(false); }
+
+    void IDisposable.Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
     #endregion
 }
 
@@ -306,7 +345,7 @@ struct MPData
 
     public static Result<MPData> LoadFromFile(string _F)
     {
-        return Result.Failure<MPData>("Not implemented!");
+        return Logger.LogResult<MPData>("Not implemented!");
     }
 }
 

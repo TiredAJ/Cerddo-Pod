@@ -1,29 +1,30 @@
 ﻿using Player;
-using ReactiveUI;
-using System.IO;
-using CSharpFunctionalExtensions;
 
-namespace MP3_Pod.ViewModels;
+namespace Cerddo_Pod.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
-    private SAPlayer SAP = new SAPlayer();
+    public SAPlayer SAP { get; private set; } = new();
 
     public string ArtistName => SAP.NowPlaying.ArtistName;
     public string TrackTitle => SAP.NowPlaying.SongName;
 
-    public int Volume
-    {
-        get => SAP.Volume;
-        set
-        {
-            SAP.Volume = value;
-            this.RaiseAndSetIfChanged(ref SAP._Volume, value);
-        }
-    }
+    //public int Volume
+    //{
+    //    get => SAP.Volume;
+    //    set
+    //    {
+    //        SAP.Volume = value;
+    //        this.RaiseAndSetIfChanged(ref SAP._Volume, value);
+    //    }
+    //}
 
     public MainViewModel()
-    { SAP.LoadFiles($"/run/media/tiredaj/AJStore/GitHub/MP3-Pod/Src/MP3-Pod.Desktop/bin/Debug/net8.0/Assets"); }
+    {
+#if DEBUG
+        _ = SAP.LoadFiles($"/run/media/tiredaj/AJStore/GitHub/Cerddo_Pod/Src/Cerddo_Pod.Desktop/bin/Debug/net8.0/Assets");
+#endif
+    }
 
     public MainViewModel(string _Loc)
     { SAP.LoadFiles(_Loc); }
