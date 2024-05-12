@@ -1,0 +1,56 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:vm="clr-namespace:Cerddo_Pod.ViewModels"
+			xmlns:Ut="clr-namespace:Cerddo_Pod.Utils"
+            mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+            x:Class="Cerddo_Pod.Views.MainView"
+            x:DataType="vm:MainViewModel"
+			x:CompileBindings="True"
+			Background="Gray">
+    <Design.DataContext>
+        <vm:MainViewModel />
+    </Design.DataContext>
+	
+	<UserControl.Styles>
+		<Style Selector="Button">
+			<Setter Property="FontSize" Value="18"/>
+			<Setter Property="HorizontalAlignment" Value="Stretch"/>
+		</Style>
+		<Style Selector="TextBlock">
+			<Setter Property="FontSize" Value="20"/>
+			<Setter Property="Background" Value="Khaki"/>
+			<Setter Property="Margin" Value="4"/>
+		</Style>
+		<Style Selector="TextBlock.H">
+			<Setter Property="FontSize" Value="25"/>
+		</Style>
+	</UserControl.Styles>
+
+	<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">		
+		<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+				Margin="10" MinWidth="350" Background="Aqua">
+			
+			<TextBlock x:Name="txt_SongName" Classes="H" 
+			           Text="{Binding SAP.NowPlaying, Converter={x:Static Ut:ConvertersUtils.SongName}}" 
+			           HorizontalAlignment="Stretch" TextWrapping="WrapWithOverflow" TextAlignment="Center"
+			           MaxWidth="550" Width="550"/>
+			
+			<TextBlock x:Name="txt_Artist" Text="{Binding SAP.NowPlaying, Converter={x:Static Ut:ConvertersUtils.Artist}}"
+			           HorizontalAlignment="Stretch" TextAlignment="Left"/>
+			
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+				<Button Content="Rewind" Command="{Binding Command_Rewind}"/>
+				<Button Content="Play/Pause" Command="{Binding Command_PlayPause}"/>
+				<Button Content="Next" Command="{Binding Command_Skip}"/>
+			</StackPanel>
+			<Slider x:Name="sldr_Progress" Maximum="{Binding SAP.NowPlaying, Converter={x:Static Ut:ConvertersUtils.Duration}}" Minimum="0" MaxWidth="500"
+			        Value="{Binding SAP.Position}"/>
+		</StackPanel>
+		<Slider Orientation="Vertical" Height="150" Maximum="1500" Minimum="0"
+			Value="{Binding SAP.Volume, Mode=TwoWay}" x:Name="sldr_Volume"/>
+		<TextBlock Text="{Binding #sldr_Volume.Value, Converter={x:Static Ut:ConvertersUtils.PercentageConverter}}" 
+		           HorizontalAlignment="Center" VerticalAlignment="Center" Width="40" TextAlignment="Center"/>
+	</StackPanel>
+</UserControl>
