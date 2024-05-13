@@ -4,7 +4,7 @@
             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
             xmlns:vm="clr-namespace:Cerddo_Pod.ViewModels"
 			xmlns:Ut="clr-namespace:Cerddo_Pod.Utils"
-            mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+            Width="800" Height="300"
             x:Class="Cerddo_Pod.Views.MainView"
             x:DataType="vm:MainViewModel"
 			x:CompileBindings="True"
@@ -16,7 +16,7 @@
 	<UserControl.Styles>
 		<Style Selector="Button">
 			<Setter Property="FontSize" Value="18"/>
-			<Setter Property="HorizontalAlignment" Value="Stretch"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
 		</Style>
 		<Style Selector="TextBlock">
 			<Setter Property="FontSize" Value="20"/>
@@ -27,30 +27,65 @@
 			<Setter Property="FontSize" Value="25"/>
 		</Style>
 	</UserControl.Styles>
-
-	<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">		
+	
+	<DockPanel x:Name="dckpnl_SuperPanel" Background="Bisque" LastChildFill="True">
+		<DockPanel x:Name="dckpnl_Volume" Background="Brown" HorizontalAlignment="Right" DockPanel.Dock="Right">
+			<TextBlock Text="{Binding #sldr_Volume.Value, Converter={x:Static Ut:ConvertersUtils.PercentageConverter}}" 
+			           HorizontalAlignment="Center" VerticalAlignment="Center" Width="40" TextAlignment="Center" DockPanel.Dock="Top"/>
+			<Slider Orientation="Vertical" Maximum="1500" Minimum="0" HorizontalAlignment="Center" VerticalAlignment="Stretch"
+						Value="{Binding SAP.Volume, Mode=TwoWay}" x:Name="sldr_Volume" Margin="0,4,0,16"/>
+			
+		</DockPanel>
+		
+		<DockPanel x:Name="stkpnl_Main" Background="Cyan" LastChildFill="True">
+			<DockPanel DockPanel.Dock="Bottom">
+				<DockPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch" LastChildFill="False">
+					<TextBlock DockPanel.Dock="Left" x:Name="txt_Position" Text="00:00"/>
+					<TextBlock DockPanel.Dock="Right" x:Name="txt_Duration" Text="00:00"/>
+					
+				</DockPanel>
+				<Slider x:Name="sldr_Progress" Maximum="{Binding SAP.NowPlaying, Converter={x:Static Ut:ConvertersUtils.Duration}}"
+				        Minimum="0" Value="{Binding SAP.Position}" HorizontalAlignment="Stretch" Margin="16,-8, 16,-4"/>
+			</DockPanel>
+			
+			<DockPanel x:Name="stkpnl_Content" Background="Fuchsia" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+			           LastChildFill="True">
+				<Border Background="Green" Margin="4" DockPanel.Dock="Left">
+					<Image x:Name="img_CoverImg" Width="200" Height="200" 
+					       Source="{Binding SAP.CoverImg, Converter={x:Static Ut:ConvertersUtils.UriToBitmap}}"/>
+				</Border>
+				
+				<DockPanel x:Name="dkpnl_Content" Margin="4" Background="Aquamarine" HorizontalAlignment="Stretch" LastChildFill="True">
+			
+					<UniformGrid x:Name="unigrid_Buttons" DockPanel.Dock="Bottom" Rows="1" Columns="3" FlowDirection="LeftToRight"
+					             HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="60,4,60,4"
+					             Background="Orchid">
+						<Button Content="Rewind" Command="{Binding Command_Rewind}" />
+						<Button Content="Play/Pause" Command="{Binding Command_PlayPause}"/>
+						<Button Content="Next" Command="{Binding Command_Skip}"/>
+					</UniformGrid>
+					<TextBlock x:Name="txt_Artist" Text="{Binding SAP.NowPlaying, Converter={x:Static Ut:ConvertersUtils.Artist}}"
+					           TextAlignment="Left" DockPanel.Dock="Bottom"/>
+					
+					<TextBlock x:Name="txt_SongName" Classes="H" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center"
+					           Text="{Binding SAP.NowPlaying, Converter={x:Static Ut:ConvertersUtils.SongName}}" 
+					           TextWrapping="WrapWithOverflow" Margin="10"/>
+				</DockPanel>
+			</DockPanel>
+		</DockPanel>
+	</DockPanel>
+	
+	<!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">		
 		<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
 				Margin="10" MinWidth="350" Background="Aqua">
 			
-			<TextBlock x:Name="txt_SongName" Classes="H" 
-			           Text="{Binding SAP.NowPlaying, Converter={x:Static Ut:ConvertersUtils.SongName}}" 
-			           HorizontalAlignment="Stretch" TextWrapping="WrapWithOverflow" TextAlignment="Center"
-			           MaxWidth="550" Width="550"/>
 			
-			<TextBlock x:Name="txt_Artist" Text="{Binding SAP.NowPlaying, Converter={x:Static Ut:ConvertersUtils.Artist}}"
-			           HorizontalAlignment="Stretch" TextAlignment="Left"/>
 			
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-				<Button Content="Rewind" Command="{Binding Command_Rewind}"/>
-				<Button Content="Play/Pause" Command="{Binding Command_PlayPause}"/>
-				<Button Content="Next" Command="{Binding Command_Skip}"/>
+				
 			</StackPanel>
-			<Slider x:Name="sldr_Progress" Maximum="{Binding SAP.NowPlaying, Converter={x:Static Ut:ConvertersUtils.Duration}}" Minimum="0" MaxWidth="500"
-			        Value="{Binding SAP.Position}"/>
+			
 		</StackPanel>
-		<Slider Orientation="Vertical" Height="150" Maximum="1500" Minimum="0"
-			Value="{Binding SAP.Volume, Mode=TwoWay}" x:Name="sldr_Volume"/>
-		<TextBlock Text="{Binding #sldr_Volume.Value, Converter={x:Static Ut:ConvertersUtils.PercentageConverter}}" 
-		           HorizontalAlignment="Center" VerticalAlignment="Center" Width="40" TextAlignment="Center"/>
-	</StackPanel>
+		
+	</StackPanel>-->
 </UserControl>

@@ -7,6 +7,7 @@ using ReactiveUI.Fody.Helpers;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using Utilities;
+using Avalonia.Media.Imaging;
 
 namespace Player;
 
@@ -56,9 +57,15 @@ public class SAPlayer : ReactiveObject, IDisposable
             this.RaiseAndSetIfChanged(ref _Position, value);
         }
     }
+    public List<byte> CoverImg
+    {
+        get => _CoverImg;
+        set => this.RaiseAndSetIfChanged(ref _CoverImg, value);
+    }
     #endregion
 
     #region Private Members
+    private List<byte> _CoverImg;
     private List<SongData> Tunes = [];
     private SongData _NowPlaying = SongData.Default;
     private double _Position = 0d;
@@ -274,6 +281,8 @@ public class SAPlayer : ReactiveObject, IDisposable
         { return; }
         Bass.GlobalStreamVolume = _Volume;
         Bass.ChannelPlay(Tunes[CurrentSong].SoundHandle, true);
+        Task.Run(() =>
+        { CoverImg = Tunes[CurrentSong].CoverImg.Value.ToList(); });
         PosRun = true;
         PosRunPause.Set();
         PositionRunner();
@@ -367,6 +376,9 @@ public class SAPlayer : ReactiveObject, IDisposable
             } while (PosRun);
         });
     }
+
+    private async Task LoadImage(byte[] _Img)
+    {  }
     #endregion
 
     #region Disposal
