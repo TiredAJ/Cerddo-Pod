@@ -1,6 +1,7 @@
 ﻿using ATL;
 using CSharpFunctionalExtensions;
 using ManagedBass;
+using ManagedBass.Flac;
 using Player.Utils;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -10,6 +11,11 @@ using Utilities;
 using Avalonia.Media.Imaging;
 
 namespace Player;
+
+//ToDo
+// - Normalise audio -> https://www.izotope.com/en/learn/audio-normalization.html
+
+
 
 public class SAPlayer : ReactiveObject, IDisposable
 {
@@ -57,15 +63,9 @@ public class SAPlayer : ReactiveObject, IDisposable
             this.RaiseAndSetIfChanged(ref _Position, value);
         }
     }
-    public List<byte> CoverImg
-    {
-        get => _CoverImg;
-        set => this.RaiseAndSetIfChanged(ref _CoverImg, value);
-    }
     #endregion
 
     #region Private Members
-    private List<byte> _CoverImg;
     private List<SongData> Tunes = [];
     private SongData _NowPlaying = SongData.Default;
     private double _Position = 0d;
@@ -90,8 +90,8 @@ public class SAPlayer : ReactiveObject, IDisposable
     private Maybe<MPData> MetaData = Maybe<MPData>.None;
     private string FolderLoc = "";
     public int _Volume = 200;
-    private bool DisposedValue, PosRun;
-    private ManualResetEventSlim PosRunPause = new ManualResetEventSlim(true);
+    private bool DisposedValue, PosRun, EndSubsribed = false;
+    private ManualResetEventSlim PosRunPause = new ManualResetEventSlim(true);    
     #endregion
 
     #region Init
@@ -108,6 +108,11 @@ public class SAPlayer : ReactiveObject, IDisposable
     {
         if (!IsInitialised)
         {
+            if (Bass.PluginLoad("libbassflac.so") == 0)
+            { Debug.WriteLine($"Libflac could not be loaded! {Bass.LastError}"); }
+            
+            Bass.PluginLoad("libbassflac.so");
+            
             IsInitialised = Bass.Init(-1, 44100, DeviceInitFlags.Stereo);
 
             if (!IsInitialised)
@@ -119,8 +124,10 @@ public class SAPlayer : ReactiveObject, IDisposable
     #endregion
 
     #region Setup
+    #if Debug
     public Result LoadFiles()
     { return LoadFiles(FolderLoc); }
+    #endif
 
     public Result LoadFiles(string _Location)
     {
@@ -202,6 +209,10 @@ public class SAPlayer : ReactiveObject, IDisposable
 
             if (R.IsFailure)
             { ErMsg += R.Error; }
+            #if DEBUG
+            else
+            { Tunes = Tunes.Shuffle(); }
+            #endif
         }
         else
         {
@@ -217,15 +228,38 @@ public class SAPlayer : ReactiveObject, IDisposable
         if (!IsInitialised)
         { return Logger.LogResult(DefMsg.BassNoInit); }
 
-        SongData Temp = new();
+        SongData Temp;
 
         while (_Songs.Count > 0)
         {
             string Song = _Songs.Dequeue();
 
+            Temp = new();
+            
             try
             {
-                Temp.SoundHandle = Bass.CreateStream(Song);
+                switch (Path.GetExtension(Song).ToLower())
+                {
+                    case ".flac":
+                    {
+                        Temp.SoundHandle = BassFlac.CreateStream(Song);
+                        break;
+                    }
+                    default:
+                    {
+                        Temp.SoundHandle = Bass.CreateStream(Song);
+                        break;
+                    }
+                }
+
+                if (Temp.SoundHandle == 0)
+                {
+                    Debug.WriteLine($"Could not load {Song}!"); 
+                    Debug.WriteLine($"Create Stream: {Song} -> {Bass.LastError}");
+                    Debug.WriteLine($"Duration: {Bass.ChannelGetLength(Temp.SoundHandle)}");
+                }
+                
+                Thread.Sleep(100);
                 Temp.Duration = Bass.ChannelBytes2Seconds(Temp.SoundHandle,
                             Bass.ChannelGetLength(Temp.SoundHandle))
                                     .DblToTS();
@@ -238,7 +272,7 @@ public class SAPlayer : ReactiveObject, IDisposable
                 Track TSong = new(Song);
 
                 if (TSong.EmbeddedPictures.Count > 0)
-                { Temp.CoverImg = Maybe.From(TSong.EmbeddedPictures.First().PictureData); }
+                { Temp.CoverImg = Maybe.From(TSong.EmbeddedPictures.First().PictureData.ToList()); }
 
                 Temp.ArtistName = TSong.Artist;
                 Temp.SongName = TSong.Title is not null ? TSong.Title : Path.GetFileNameWithoutExtension(Song);
@@ -279,13 +313,39 @@ public class SAPlayer : ReactiveObject, IDisposable
     {
         if (!CheckPlay())
         { return; }
+
+        Position = 0;
+        
+        //Debug.WriteLine($"[Play] Current Index: {CurrentSong}");
+        
         Bass.GlobalStreamVolume = _Volume;
         Bass.ChannelPlay(Tunes[CurrentSong].SoundHandle, true);
-        Task.Run(() =>
-        { CoverImg = Tunes[CurrentSong].CoverImg.Value.ToList(); });
+        
+        Syncer.InitSync(Tunes[CurrentSong].SoundHandle);
+        
+        if (!EndSubsribed)
+        {
+            Syncer.EndOfSong += SyncerOnEndOfSong;;
+            EndSubsribed = true;
+        }
+        
+        Debug.WriteLine($"[Play] EndSubsribed: {EndSubsribed}");
+        
         PosRun = true;
         PosRunPause.Set();
         PositionRunner();
+    }
+
+    private void SyncerOnEndOfSong(object? _Sender, EventArgs _E)
+    {
+        
+        if (EndSubsribed)
+        {
+            Syncer.EndOfSong -= SyncerOnEndOfSong;
+            EndSubsribed = false;
+        }
+        
+        Skip();
     }
 
     public void Pause()
@@ -371,14 +431,10 @@ public class SAPlayer : ReactiveObject, IDisposable
                 PosRunPause.Wait();
                 _ParPosition = NowPlaying.SoundHandle.ChannelPos();
                 Position = _ParPosition;
-                //Debug.WriteLine($"Pos: {Position}");
                 Thread.Sleep(250);
             } while (PosRun);
         });
     }
-
-    private async Task LoadImage(byte[] _Img)
-    {  }
     #endregion
 
     #region Disposal
@@ -426,7 +482,7 @@ public struct SongData
     public int SoundHandle;
     public string SongName;
     public string ArtistName;
-    public Maybe<byte[]> CoverImg;
+    public Maybe<List<byte>> CoverImg;
     public TimeSpan Duration;
 
     public static SongData Default = new SongData()
@@ -435,6 +491,18 @@ public struct SongData
         ArtistName = "Nessie",
         SongName = "The Loch",
         Duration = TimeSpan.MaxValue,
-        CoverImg = Maybe<byte[]>.None
+        CoverImg = new Maybe<List<byte>>()
     };
+}
+
+public class Syncer
+{
+    public static event EventHandler? EndOfSong;
+    private static SyncProcedure IntSyncer = new SyncProcedure(SyncProc);
+
+    public static void InitSync(int _Handle)
+    { Bass.ChannelSetSync(_Handle, SyncFlags.End | SyncFlags.Mixtime, 0, IntSyncer); }
+
+    private static void SyncProc(int _Handle, int _Channel, int _Data, IntPtr _User)
+    { EndOfSong?.Invoke(null, EventArgs.Empty); }
 }

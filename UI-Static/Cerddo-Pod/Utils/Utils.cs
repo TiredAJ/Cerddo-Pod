@@ -51,7 +51,7 @@ public static class Extensions
 public class Helpers
 {
     public static Uri DefaultImageUri =
-        new Uri("avares://Cerddo_Pod/Assets/Icons/Default.png");
+        new Uri("avares://Cerddo_Pod/Assets/Icons/nessie_guitar.png");
 
     public static Bitmap DefaultImage => LoadFromResource(DefaultImageUri);
 

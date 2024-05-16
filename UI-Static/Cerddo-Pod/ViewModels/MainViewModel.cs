@@ -7,9 +7,6 @@ public class MainViewModel : ViewModelBase
 {
     public SAPlayer SAP { get; private set; } = new();
 
-    public string ArtistName => SAP.NowPlaying.ArtistName;
-    public string TrackTitle => SAP.NowPlaying.SongName;
-
     public MainViewModel()
     {
 #if DEBUG

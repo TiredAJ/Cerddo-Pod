@@ -36,4 +36,18 @@ public static class Extensions
 
     public static double ChannelPos(this int _Handle)
     { return Bass.ChannelBytes2Seconds(_Handle, Bass.ChannelGetPosition(_Handle)); }
+
+    public static List<SongData> Shuffle(this List<SongData> _Arr)
+    {//https://stackoverflow.com/a/110570/19306828
+        Random RNG = new Random((int)DateTime.Now.Ticks);
+        
+        int n = _Arr.Count;
+        while (n > 1) 
+        {
+            int k = RNG.Next(n--);
+            
+            (_Arr[n], _Arr[k]) = (_Arr[k], _Arr[n]);
+        }
+        return _Arr;
+    }
 }

@@ -1,15 +1,11 @@
 ﻿using Avalonia.Data.Converters;
 using Avalonia.Media.Imaging;
+using CSharpFunctionalExtensions;
 using Player;
-using Player.Utils;
 using System;
-using ManagedBass;
 using System.Collections.Generic;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
-using SixLabors.ImageSharp.Formats.Png;
 using System.IO;
-using Configuration = SixLabors.ImageSharp.Configuration;
+using System.Transactions;
 
 namespace Cerddo_Pod.Utils;
 
@@ -31,23 +27,25 @@ public static class ConvertersUtils
     public static FuncValueConverter<SongData, double> Duration { get; } =
         new(_Value => _Value.Duration.TotalSeconds);
 
+    public static FuncValueConverter<SongData, string> DurationStr { get; } =
+        new(_Value => _Value.Duration.TotalHours >= 1 ? 
+                TimeSpan.FromSeconds(_Value.Duration.TotalSeconds).ToString("hh\\:mm\\:ss") :
+                TimeSpan.FromSeconds(_Value.Duration.TotalSeconds).ToString("mm\\:ss"));
+
+    public static FuncValueConverter<double, string> PositionStr { get; } =
+        new(_Value => _Value >= 3600 ? 
+                TimeSpan.FromSeconds(_Value).ToString("hh\\:mm\\:ss") :
+                TimeSpan.FromSeconds(_Value).ToString("mm\\:ss"));
+
     public static FuncValueConverter<Uri, Bitmap> UriToBitmap { get; } =
         new(_Value => Helpers.LoadFromResource(_Value));
 
-    public static FuncValueConverter<List<byte>, Bitmap> BytesToBitmap { get; } =
+    public static FuncValueConverter<SongData, Bitmap> BytesToBitmap { get; } =
         new(_Value =>
         {
-            if (_Value is null)
+            if (_Value.CoverImg.HasNoValue)
             { return Helpers.DefaultImage; }
             
-            using (var Data = Image.Load(new MemoryStream(_Value.ToArray())))
-            {
-                Stream Temp = new MemoryStream();
-                
-                //string Loc = Path.GetTempFileName();
-                Data.SaveAsPng(Temp);
-                
-                return new Bitmap(Temp);
-            }
+            return new Bitmap(new MemoryStream(_Value.CoverImg.Value.ToArray()));
         });
 }

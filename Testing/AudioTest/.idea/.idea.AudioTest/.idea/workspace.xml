@@ -9,25 +9,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="46b599a2-9c88-450f-b3db-9f65c4995c85" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.AudioTest/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.AudioTest/.idea/indexLayout.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.AudioTest/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.AudioTest/.idea/projectSettingsUpdater.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.AudioTest/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.AudioTest/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Assets/Icons/Default.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Assets/Icons/avalonia-logo.ico" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Utils/Utils.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Assets/Place test files here.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Attributions.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Assets/avalonia-logo.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.AudioTest/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.AudioTest/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Cerddo_Pod.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Cerddo_Pod.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Utils/Converters.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Utils/Converters.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Utils/Extensions.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/ViewModels/MainViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/ViewModels/MainViewModel.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Views/MainView.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Views/MainView.axaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Views/MainView.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Views/MainView.axaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Views/MainWindow.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Views/MainWindow.axaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../UI-Static/Player/Extensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../UI-Static/Player/Utils.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../UI-Static/Player/Player.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/../../UI-Static/Player/Player.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../UI-Static/Player/SAPlayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../UI-Static/Player/SAPlayer.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -38,29 +24,49 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 2
-}]]></component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;TiredAJ&quot;
+  }
+}</component>
+  <component name="GitToolBoxStore">
+    <option name="projectConfigVersion" value="5" />
+  </component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/TiredAJ/Cerddo-Pod&quot;,
+    &quot;accountId&quot;: &quot;63577aea-23c9-4ceb-8613-8684bdb3b809&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="2gOwGFYGdlm7SYTFirqe3WxVKye" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/home/tiredaj/Repos",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/tiredaj/Repos&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   },
-  "keyToStringList": {
-    "rider.external.source.directories": [
-      "/home/tiredaj/.config/JetBrains/Rider2024.1/resharper-host/DecompilerCache",
-      "/home/tiredaj/.config/JetBrains/Rider2024.1/resharper-host/SourcesCache",
-      "/home/tiredaj/.local/share/Symbols/src"
+  &quot;keyToStringList&quot;: {
+    &quot;rider.external.source.directories&quot;: [
+      &quot;/home/tiredaj/.config/JetBrains/Rider2024.1/resharper-host/DecompilerCache&quot;,
+      &quot;/home/tiredaj/.config/JetBrains/Rider2024.1/resharper-host/SourcesCache&quot;,
+      &quot;/home/tiredaj/.local/share/Symbols/src&quot;
     ]
   }
-}]]></component>
+}</component>
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="open Cerddo-Pod" />
+    </option>
+  </component>
   <component name="RunManager" selected=".NET Launch Settings Profile.AudioTest">
     <configuration name="AudioTest: FolderProfile" type="DotNetMsBuildPublish" factoryName="Publish to IIS">
       <riderPublish publish_profile="FolderProfile.pubxml" pubxml_path="$PROJECT_DIR$/Properties/PublishProfiles/FolderProfile.pubxml" uuid_high="-6563785580793936971" uuid_low="-8266365753678149393" />
@@ -92,6 +98,8 @@
       <updated>1715358262525</updated>
       <workItem from="1715358263553" duration="302000" />
       <workItem from="1715581834922" duration="688000" />
+      <workItem from="1715713142597" duration="1519000" />
+      <workItem from="1715719441257" duration="166000" />
     </task>
     <servers />
   </component>
