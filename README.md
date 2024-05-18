@@ -7,7 +7,7 @@ Name comes from the Welsh for music "cerddoriaeth" (kerthor-ee-aeth) and pod, fo
 ## Terms
 - Mixer = person who made a mix file
 - Listener = person receiving and listening to a mix file
-- MixFile = compressed file containing the music files, .mpdata file and optionally a UI-Static program and .mpview file
+- MixFile = compressed file containing the music files, .mpdata file and optionally a UI-Portable program and .mpview file
 
 ## Structure
 The project is split into two programs:
