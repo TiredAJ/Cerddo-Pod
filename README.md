@@ -5,11 +5,18 @@ Pronounced "Kertho Pod".
 Name comes from the Welsh for music "cerddoriaeth" (kerthor-ee-aeth) and pod, for well, pod.
 Terms
 
+<<<<<<< HEAD
     Mixer = person who made a mix file
     Listener = person receiving and listening to a mix file
     MixFile = compressed file containing the music files, .mpdata file and optionally a UI-Portable program and .mpview file
 
 Structure
+=======
+## Terms
+- Mixer = person who made a mix file
+- Listener = person receiving and listening to a mix file
+- MixFile = compressed file containing the music files, .mpdata file and optionally a UI-Portable program and .mpview file
+>>>>>>> 0d013989f328d404a2421d6712ade6d355802b74
 
 The project is split into two programs:
 
