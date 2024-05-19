@@ -337,8 +337,7 @@ public class SAPlayer : ReactiveObject, IDisposable
     }
 
     private void SyncerOnEndOfSong(object? _Sender, EventArgs _E)
-    {
-        
+    {        
         if (EndSubsribed)
         {
             Syncer.EndOfSong -= SyncerOnEndOfSong;
