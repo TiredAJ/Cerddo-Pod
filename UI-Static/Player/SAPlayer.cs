@@ -9,6 +9,8 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using Utilities;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform;
+using System.Runtime.InteropServices;
 
 namespace Player;
 
@@ -108,12 +110,19 @@ public class SAPlayer : ReactiveObject, IDisposable
     {
         if (!IsInitialised)
         {
-            if (Bass.PluginLoad("libbassflac.so") == 0)
-            { Debug.WriteLine($"Libflac could not be loaded! {Bass.LastError}"); }
+            string FlacPuginName = "";
             
-            Bass.PluginLoad("libbassflac.so");
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            { FlacPuginName = "libbassflac.so"; }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            { FlacPuginName = "bassflac.dll"; }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            { FlacPuginName = "libbassflac.dylib"; }
             
-            IsInitialised = Bass.Init(-1, 44100, DeviceInitFlags.Stereo);
+            if (Bass.PluginLoad(FlacPuginName) == 0)
+            { Debug.WriteLine($"Plugin \"{FlacPuginName}\" could not be loaded! {Bass.LastError}"); }
+            
+            IsInitialised = Bass.Init(-1, 48000, DeviceInitFlags.Stereo);
 
             if (!IsInitialised)
             { Logger.Log($"Bass couldn't initialise! {Bass.LastError}"); }
@@ -476,6 +485,9 @@ struct MPData
     }
 }
 
+/// <summary>
+/// Contains all the data necessary to represent a song.
+/// </summary>
 public struct SongData
 {
     public int SoundHandle;
@@ -492,6 +504,15 @@ public struct SongData
         Duration = TimeSpan.MaxValue,
         CoverImg = new Maybe<List<byte>>()
     };
+}
+
+/// <summary>
+/// This contains the effects that will be applied
+/// to the it's owning song.
+/// </summary>
+public struct SongEffects
+{
+    
 }
 
 public class Syncer

@@ -1,0 +1,3 @@
+Build commands that worked:
+dotnet publish -c Release -r *platform* -p:PublishTrimmed=true -p:PublishSingleFile=true
+then go to contained "publish" folder. Bass dlls need to be added manually tho
