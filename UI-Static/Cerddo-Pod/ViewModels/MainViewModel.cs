@@ -15,7 +15,7 @@ public class MainViewModel : ViewModelBase
     public SAPlayer SAP { get; private set; } = new();
 
     public MainViewModel()
-    {  }
+    { }
 
     public MainViewModel(string _Loc)
     { SAP.LoadMix(_Loc); }
@@ -51,4 +51,7 @@ public class MainViewModel : ViewModelBase
         else
         { Logger.Log("FolderLoc count error!"); }        
     }
+
+    public void Closing()
+    { SAP.Closing(); }
 }

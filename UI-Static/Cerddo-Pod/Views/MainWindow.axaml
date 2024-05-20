@@ -5,6 +5,7 @@
         x:Class="Cerddo_Pod.Views.MainWindow"
         Title="Cerddo-Pod"
         Icon="/Assets/Icons/nessie_guitar.ico"
-        CanResize="False">
+        CanResize="False"
+        Closing="Window_OnClosing">
         <views:MainView />
 </Window>

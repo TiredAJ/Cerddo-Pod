@@ -517,5 +517,14 @@ public class SAPlayer : PlayerBase, IDisposable
         Dispose(true);
         GC.SuppressFinalize(this);
     }
+
+    public void Closing()
+    {
+        Stop();
+        
+        this.Dispose(true);
+        
+        Logger.Log($"Disposing and closing program");
+    }
     #endregion
 }

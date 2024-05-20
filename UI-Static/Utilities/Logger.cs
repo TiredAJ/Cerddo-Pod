@@ -11,7 +11,7 @@ public sealed class Logger
     private static ManualResetEventSlim WhileWriting = new ManualResetEventSlim(true);
     private static object Lock = new();
     private static string LogLoc = string.Empty;
-    private static bool WriterRunning = false;
+    private static bool WriterRunning = false, Waiting = false;
 
     #region Pushing to _Log
     /// <summary>
@@ -145,15 +145,15 @@ public sealed class Logger
 
         FileTemp.Enqueue(_Msg);
 
-        //change this to check if it's already set \/
+        if (Waiting)
+        { return; }
 
-        if (WhileWriting.IsSet)
-        {
-            
-        }
+        Waiting = true;
         
         WhileWriting.Wait();
         WhileWriting.Reset();
+
+        Waiting = false;
 
         Task.Run(static () =>
         {
