@@ -18,7 +18,7 @@ public class MainViewModel : ViewModelBase
     {  }
 
     public MainViewModel(string _Loc)
-    { SAP.LoadFiles(_Loc); }
+    { SAP.LoadMix(_Loc); }
     
     public void Command_PlayPause()
     { SAP.TogglePause(); }
@@ -47,7 +47,7 @@ public class MainViewModel : ViewModelBase
         var FolderLoc = await ISP.OpenFolderPickerAsync(FPOO);
 
         if (FolderLoc.Count > 0 &&  FolderLoc.First().TryGetLocalPath() is { } LP)
-        { SAP.LoadFiles(LP); }
+        { SAP.LoadMix(LP); }
         else
         { Logger.Log("FolderLoc count error!"); }        
     }

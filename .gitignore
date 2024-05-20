@@ -409,3 +409,5 @@ FodyWeavers.xsd
 *.lpcm
 *.aiff
 *.alac
+TempBassStuff
+UI-Static/Player/bassflac24-osx.zip

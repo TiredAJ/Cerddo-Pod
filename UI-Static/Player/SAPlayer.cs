@@ -3,28 +3,18 @@ using CSharpFunctionalExtensions;
 using ManagedBass;
 using ManagedBass.Flac;
 using Player.Utils;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using Utilities;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform;
-using System.Runtime.InteropServices;
+using ReactiveUI;
 
 namespace Player;
 
-//ToDo
-// - Normalise audio -> https://www.izotope.com/en/learn/audio-normalization.html
-
-
-
-public class SAPlayer : ReactiveObject, IDisposable
+public class SAPlayer : PlayerBase, IDisposable
 {
-    #region Public Members
-    public const string METAFILEEXT = ".mpdata";
-    public ImmutableArray<string> SUPPORTEDFILETYPES = [".wav", ".mp3", ".ogg", ".aiff", ".mp2", ".mp1", ".flac"];
-    
+    #region Public Properties
+    /// <summary>
+    /// Property for setting Bass' <see cref="Bass.GlobalStreamVolume"/>
+    /// </summary>
     public int Volume
     {
         get => _Volume;
@@ -37,8 +27,9 @@ public class SAPlayer : ReactiveObject, IDisposable
             this.RaiseAndSetIfChanged(ref _Volume, value);
         }
     }
-    public bool IsInitialised { get; private set; } = false;
-    public bool IsPaused { get; private set; } = false;
+    /// <summary>
+    /// Keeps up with the currently playing song
+    /// </summary>
     public SongData NowPlaying
     {
         get
@@ -50,6 +41,9 @@ public class SAPlayer : ReactiveObject, IDisposable
         }
         private set => this.RaiseAndSetIfChanged(ref _NowPlaying, value);
     }
+    /// <summary>
+    /// Position of <see cref="NowPlaying"/>
+    /// </summary>
     public double Position
     {
         get => _Position;
@@ -65,13 +59,10 @@ public class SAPlayer : ReactiveObject, IDisposable
             this.RaiseAndSetIfChanged(ref _Position, value);
         }
     }
-    #endregion
-
-    #region Private Members
-    private List<SongData> Tunes = [];
-    private SongData _NowPlaying = SongData.Default;
-    private double _Position = 0d;
-    private double _ParPosition = 0d;
+    /// <summary>
+    /// Holds the index of the currently played
+    /// song from <see cref="PlayerBase.Tunes"/>
+    /// </summary>
     public int CurrentSong
     {
         get => _CurrentSong;
@@ -87,15 +78,15 @@ public class SAPlayer : ReactiveObject, IDisposable
             NowPlaying = Tunes[_CurrentSong];
         }
     }
-    private int _CurrentSong = 0;
-
-    private Maybe<MPData> MetaData = Maybe<MPData>.None;
-    private string FolderLoc = "";
-    public int _Volume = 200;
-    private bool DisposedValue, PosRun, EndSubsribed = false;
-    private ManualResetEventSlim PosRunPause = new ManualResetEventSlim(true);    
     #endregion
 
+    #region Private
+    /// <summary>
+    /// Metadata for the whole application
+    /// </summary>
+    private Maybe<MPData> MetaData = Maybe<MPData>.None;
+    #endregion
+    
     #region Init
     public SAPlayer()
     { _Init(); }
@@ -106,26 +97,48 @@ public class SAPlayer : ReactiveObject, IDisposable
         _Init();
     }
 
+    /// <summary>
+    /// Contained initialiser, ensures Bass is freed and reset, then initialised for use
+    /// </summary>
     private void _Init()
     {
+        if (IsInitialised)
+        {
+            //Frees all streams, not sure if necessary when calling Bass.Free()
+            foreach (var SD in Tunes)
+            { Bass.StreamFree(SD.SoundHandle); }
+            
+            Bass.Free();
+            Bass.PluginFree(BassFlacHandle);
+            BassFlacHandle = 0;
+
+            IsInitialised = false;
+        }
+        
         if (!IsInitialised)
         {
             string FlacPuginName = "";
             
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            { FlacPuginName = "libbassflac.so"; }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            { FlacPuginName = "bassflac.dll"; }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            { FlacPuginName = "libbassflac.dylib"; }
-            
-            if (Bass.PluginLoad(FlacPuginName) == 0)
-            { Debug.WriteLine($"Plugin \"{FlacPuginName}\" could not be loaded! {Bass.LastError}"); }
+            //Checks the platform to get the right name for the bass flac plugin
+            switch (Platformer.GetPlatform())
+            {
+                case OSPlat.Windows:
+                { FlacPuginName = "libbassflac.so"; break; }
+                case OSPlat.Linux:
+                { FlacPuginName = "bassflac.dll"; break; }                    
+                case OSPlat.OSX:
+                { FlacPuginName = "libbassflac.dylib"; break; }
+                case OSPlat.Other:
+                {Logger.LogThrow($"Unknown platform! {Platformer.GetPlatformStr()}"); return; }
+            }
+
+            if (BassHelpers.PluginLoad(out BassFlacHandle, FlacPuginName))
+            { Logger.Log($"Plugin \"{FlacPuginName}\" could not be loaded! {Bass.LastError}"); }
             
             IsInitialised = Bass.Init(-1, 48000, DeviceInitFlags.Stereo);
 
             if (!IsInitialised)
-            { Logger.Log($"Bass couldn't initialise! {Bass.LastError}"); }
+            { throw Logger.LogThrow($"Bass couldn't initialise! {Bass.LastError}"); }
 
             DisposedValue = false;
         }
@@ -133,18 +146,56 @@ public class SAPlayer : ReactiveObject, IDisposable
     #endregion
 
     #region Setup
-    #if Debug
-    public Result LoadFiles()
-    { return LoadFiles(FolderLoc); }
-    #endif
-
-    public Result LoadFiles(string _Location)
+    public Result LoadMix(string _Location)
     {
+        string Loc = _Location;
+
+        if (!File.Exists(Loc))
+        { Logger.Log("Location doesn't seem to be a file, trying directory..."); }
+        else if (!Directory.Exists(Loc))
+        { return Logger.LogResult("Location doesn't seem to be a folder either!"); }
+        else
+        {
+            var R = ExtractFiles(Loc);
+
+            if (R.IsFailure)
+            { return Logger.LogResult(R.Error); }
+
+            Loc = R.Value;
+        }
+
+        return _LoadMix(Loc);
+    }
+
+    private Result<string> ExtractFiles(string _Location)
+    {
+        string TempLoc = Directory.CreateTempSubdirectory("Cerddo-Pod").FullName;
+
+        try
+        { Zipper.Extract(_Location, TempLoc); }
+        catch (Exception EXC)
+        { return Logger.LogResult<string>(EXC.ToString()); }
+
+        return Result.Success(TempLoc);
+    }
+    
+    /// <summary>
+    /// Loads files from a specified *Folder/Directory*
+    /// </summary>
+    /// <param name="_Location">The path to the folder</param>
+    /// <returns>
+    /// A <see cref="Result"/> determining the outcome of the
+    /// operation and it's nested operations. 
+    /// </returns>
+    private Result _LoadMix(string _Location)
+    {
+        //Checks if the object has been disposed, just in case
         if (DisposedValue)
-        { return Logger.LogResult(DefMsg.BassDispose); }
+        { return Logger.LogResult(DefMsg.PlayerDisposed); }
 
         Result R;
 
+        //Checks if folder exists
         R = FolderChecker(_Location);
 
         if (R.IsFailure)
@@ -164,19 +215,20 @@ public class SAPlayer : ReactiveObject, IDisposable
         if (!Directory.Exists(_Loc))
         { return Logger.LogResult($"Folder \"{_Loc}\" does not exist!"); }
         else if (!Directory.GetFiles(_Loc).Any(X => X.EndsWith(METAFILEEXT)))
-        { return Logger.LogResult($"No {METAFILEEXT} datafile was present!"); }
-        else
-        { return Result.Success(); }
+        { Logger.Log($"No {METAFILEEXT} datafile was present!"); }
+        
+        return Result.Success();
     }
 
     private Result _LoadFiles(string _Loc)
     {
         //https://learn.microsoft.com/en-us/dotnet/core/extensions/file-globbing#get-all-matching-files
         var Files = Directory.GetFiles(_Loc);
+        //TODO: change to List or IEnummerable?
         Queue<string> _Songs = new();
         bool Errors = false;
 
-        Debug.WriteLine($"Files: {Files.Length}");
+        Logger.Log($"Found {Files.Length} files in mix");
 
         string Ext, ErMsg = string.Empty;
 
@@ -218,10 +270,6 @@ public class SAPlayer : ReactiveObject, IDisposable
 
             if (R.IsFailure)
             { ErMsg += R.Error; }
-            #if DEBUG
-            else
-            { Tunes = Tunes.Shuffle(); }
-            #endif
         }
         else
         {
@@ -325,8 +373,6 @@ public class SAPlayer : ReactiveObject, IDisposable
 
         Position = 0;
         
-        //Debug.WriteLine($"[Play] Current Index: {CurrentSong}");
-        
         Bass.GlobalStreamVolume = _Volume;
         Bass.ChannelPlay(Tunes[CurrentSong].SoundHandle, true);
         
@@ -423,7 +469,7 @@ public class SAPlayer : ReactiveObject, IDisposable
     private bool CheckPlay()
     {
         if (DisposedValue)
-        { Logger.Log(DefMsg.BassDispose); return false; }
+        { Logger.Log(DefMsg.PlayerDisposed); return false; }
         else if (Tunes.Count == 0)
         { Logger.Log(DefMsg.TuneCount); return false; }
         else
@@ -456,6 +502,7 @@ public class SAPlayer : ReactiveObject, IDisposable
                 { Bass.StreamFree(SD.SoundHandle); }
 
                 Bass.Free();
+                Bass.PluginFree(BassFlacHandle);
             }
 
             DisposedValue = true;
@@ -471,58 +518,4 @@ public class SAPlayer : ReactiveObject, IDisposable
         GC.SuppressFinalize(this);
     }
     #endregion
-}
-
-struct MPData
-{
-    public MPData()
-    {
-    }
-
-    public static Result<MPData> LoadFromFile(string _F)
-    {
-        return Logger.LogResult<MPData>("Not implemented!");
-    }
-}
-
-/// <summary>
-/// Contains all the data necessary to represent a song.
-/// </summary>
-public struct SongData
-{
-    public int SoundHandle;
-    public string SongName;
-    public string ArtistName;
-    public Maybe<List<byte>> CoverImg;
-    public TimeSpan Duration;
-
-    public static SongData Default = new SongData()
-    {
-        SoundHandle = 0,
-        ArtistName = "Nessie",
-        SongName = "The Loch",
-        Duration = TimeSpan.MaxValue,
-        CoverImg = new Maybe<List<byte>>()
-    };
-}
-
-/// <summary>
-/// This contains the effects that will be applied
-/// to the it's owning song.
-/// </summary>
-public struct SongEffects
-{
-    
-}
-
-public class Syncer
-{
-    public static event EventHandler? EndOfSong;
-    private static SyncProcedure IntSyncer = new SyncProcedure(SyncProc);
-
-    public static void InitSync(int _Handle)
-    { Bass.ChannelSetSync(_Handle, SyncFlags.End | SyncFlags.Mixtime, 0, IntSyncer); }
-
-    private static void SyncProc(int _Handle, int _Channel, int _Data, IntPtr _User)
-    { EndOfSong?.Invoke(null, EventArgs.Empty); }
 }
