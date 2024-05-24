@@ -7,10 +7,8 @@ namespace Utilities;
 public sealed class Logger
 {
     private static ConcurrentQueue<(DateTime Stamp, string Msg)> FileTemp = new();
-    private static ConcurrentQueue<(DateTime Stamp, string Msg)> _Log = new();
-    private static ManualResetEventSlim WhileWriting = new ManualResetEventSlim(true);
-    private static object Lock = new();
-    private static string LogLoc = string.Empty;
+    private static ManualResetEventSlim WhileWriting = new (true);
+    private static string LogLocaction = string.Empty;
     private static bool WriterRunning = false, Waiting = false;
 
     #region Pushing to _Log
@@ -26,7 +24,7 @@ public sealed class Logger
     /// </summary>
     /// <param name="_Msg"><see cref="DefMsg"/> to push</param>
     public static void Log(DefMsg _Msg)
-    { _PushLog(_Msg.ToString()); }
+    { _PushLog(_Msg.StrDisplay()); }
 
     /// <summary>
     /// Pushes a string to the log, returning a failed result
@@ -47,7 +45,7 @@ public sealed class Logger
     public static Result LogResult(DefMsg _Msg)
     {
         _PushLog(_Msg.ToString());
-        return Result.Failure(_Msg.ToString());
+        return Result.Failure(_Msg.StrDisplay());
     }
     
     /// <summary>
@@ -69,7 +67,7 @@ public sealed class Logger
     public static Result<T> LogResult<T>(DefMsg _Msg)
     {
         _PushLog(_Msg.ToString());
-        return Result.Failure<T>(_Msg.ToString());
+        return Result.Failure<T>(_Msg.StrDisplay());
     }
 
     /// <summary>
@@ -90,8 +88,8 @@ public sealed class Logger
     /// <returns>_Msg converted to it's string equivalents</returns>
     public static string LogStr(DefMsg _Msg)
     {
-        _PushLog(_Msg.ToString());
-        return _Msg.ToString();
+        _PushLog(_Msg.StrDisplay());
+        return _Msg.StrDisplay();
     }
     
     /// <summary>
@@ -107,45 +105,43 @@ public sealed class Logger
     }
     
     /// <summary>
-    /// Pushes a <see cref="DefMsg"/> to the log, returning an exception containing the message
+    /// Private, base function to push to all the logs
     /// </summary>
-    /// <param name="_Msg"><see cref="DefMsg"/> to push</param>
-    /// <returns>An exception containing _Msg</returns>
+    /// <param name="_Msg">string message to push</param>
     private static void _PushLog(string _Msg)
     {
         Task.Run(() =>
         {
             var MSG = (DateTime.Now, _Msg);
 
-            _Log.Enqueue(MSG);
-
             SendLog_Debug(MSG);
-            SendLog_StdOut(MSG);
             SendLog_File(MSG);
         });
     }
     #endregion
 
     #region Actual logging
+    [Conditional("DEBUG")]
     private static void SendLog_Debug((DateTime Stamp, string Msg) _Msg)
     { Debug.WriteLine(_Msg.StrDisplay()); }
 
-    private static void SendLog_StdOut((DateTime Stamp, string Msg) _Msg)
-    { Console.WriteLine(_Msg.StrDisplay()); }
-
     private static void SendLog_File((DateTime Stamp, string Msg) _Msg)
     {
-        if (LogLoc == string.Empty)
+        //Checks that there's a log file to write to
+        if (LogLocaction == string.Empty)
         {
-            LogLoc = Path.Combine(
+            LogLocaction = Path.Combine(
                         Environment.GetFolderPath
                             (Environment.SpecialFolder.DesktopDirectory),
-                        "Log.txt");
+                        "CerddoPod-Log.txt");
         }
 
+        //enques the current message to the file queue
         FileTemp.Enqueue(_Msg);
 
-        if (Waiting)
+        //If there's already a thread waiting to execute, it'll return
+        //because the message has already been 
+        if (Waiting || WriterRunning)
         { return; }
 
         Waiting = true;
@@ -157,23 +153,26 @@ public sealed class Logger
 
         Task.Run(static () =>
         {
+            if (FileTemp.IsEmpty)
+            { return; }
+            
+            WriterRunning = true;
+            
             (DateTime Stamp, string Msg) Temp;
 
-            while (!FileTemp.IsEmpty)
+            using (StreamWriter Writer = new (LogLocaction, true))
             {
-                if (FileTemp.IsEmpty)
-                { break; }
-
-                using (StreamWriter Writer = new StreamWriter(LogLoc, true))
+                while (!FileTemp.IsEmpty)
                 {
-                    while (!FileTemp.IsEmpty)
-                    {
-                        if (FileTemp.TryDequeue(out Temp))
-                        { Writer.WriteLine(Temp.StrDisplay()); }
-                    }
+                    if (FileTemp.TryDequeue(out Temp))
+                    { Writer.WriteLine(Temp.StrDisplay()); }
                 }
+                
+                Writer.Close();
             }
+            
             WhileWriting.Set();
+            WriterRunning = false;
         });
     }
     #endregion
@@ -208,13 +207,13 @@ static class Extensions
         switch (_Msg)
         {
             case DefMsg.PlayerDisposed:
-            { return "Bass has been disposed! Please re-initialise."; }
+            { return "Player object has been disposed! Please re-initialise."; }
             case DefMsg.TuneCount:
             { return "Tunes contains no songs to play."; }
             case DefMsg.BassNoInit:
             { return "Bass is not initialised."; }
             default:
-            { return "Unknown Default Message"; }
+            { return "Unknown Default Message."; }
         }
     }
 }

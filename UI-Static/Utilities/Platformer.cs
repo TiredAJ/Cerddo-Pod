@@ -5,6 +5,11 @@ namespace Utilities;
 public class Platformer
 {
     private static OSPlat _CurPlatform = OSPlat.Other;
+    
+    /// <summary>
+    /// Gets the <see cref="OSPlat"/> of the current platform
+    /// </summary>
+    /// <returns><see cref="OSPlat"/></returns>
     public static OSPlat GetPlatform()
     {
         if (_CurPlatform != OSPlat.Other)
@@ -16,26 +21,40 @@ public class Platformer
         { _CurPlatform = OSPlat.Windows; }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         { _CurPlatform = OSPlat.OSX; }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
+        { _CurPlatform = OSPlat.FreeBSD; }
         else
         { _CurPlatform = OSPlat.Other; }
         
         return _CurPlatform;
     }
 
+    /// <summary>
+    /// Gets a string representation of the current platform
+    /// </summary>
+    /// <returns>Either "Linux", "Windows", "OSX", "FreeBSD" or otherwise the OSDescription
+    /// provided by the runtime</returns>
     public static string GetPlatformStr()
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        { return "Linux"; }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        { return "Windows"; }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        { return "OSX"; }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
-        { return "FreeBSD"; }
-        else
-        { return RuntimeInformation.OSDescription; }
+        switch (GetPlatform())
+        {
+            case OSPlat.Linux:
+            { return "Linux"; }
+            case OSPlat.Windows:
+            { return "Windows"; }
+            case OSPlat.OSX:
+            { return "OSX"; }
+            case OSPlat.FreeBSD:
+            { return "FreeBSD"; }
+            default:
+            { return RuntimeInformation.OSDescription; }
+        }
     }
 
+    /// <summary>
+    /// Gets the architecture (<see cref="OSArch"/>) of the current platform
+    /// </summary>
+    /// <returns><see cref="OSArch"/></returns>
     public static OSArch GetArchitecture()
     {
         switch (RuntimeInformation.ProcessArchitecture)
@@ -55,6 +74,7 @@ public enum OSPlat
     Windows,
     Linux,
     OSX,
+    FreeBSD,
     Other
 }
 

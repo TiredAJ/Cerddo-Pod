@@ -134,8 +134,8 @@ public class SAPlayer : PlayerBase, IDisposable
 
             if (BassHelpers.PluginLoad(out BassFlacHandle, FlacPuginName))
             { Logger.Log($"Plugin \"{FlacPuginName}\" could not be loaded! {Bass.LastError}"); }
-            
-            IsInitialised = Bass.Init(-1, 48000, DeviceInitFlags.Stereo);
+
+            IsInitialised = Bass.Init(-1, 48000, DeviceInitFlags.Stereo);          
 
             if (!IsInitialised)
             { throw Logger.LogThrow($"Bass couldn't initialise! {Bass.LastError}"); }
