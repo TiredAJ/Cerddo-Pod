@@ -51,6 +51,9 @@ public class ZipperTester
     {
         var ZipDestination = "C:\\Users\\gecko\\Desktop\\Files.tar.gz";
         var DirSource = "E:\\GitHub\\Cerddo-Pod\\Testing\\AudioFiles";
+
+        if (File.Exists(ZipDestination))
+        { File.Delete(ZipDestination); }
         
         /*****************************************/
         Zipper.Compress(ZipDestination, DirSource);

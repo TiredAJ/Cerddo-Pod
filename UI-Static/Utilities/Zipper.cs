@@ -35,9 +35,13 @@ public class Zipper
         Logger.Log($"Compressing folder to [{_ZipDestination}].");
         
         Stream OutStream = File.Create(_ZipDestination);
-        Stream GZOutStream = new GZipOutputStream(OutStream);
+        var GZOutStream = new GZipOutputStream(OutStream);
+        
+        //hmmm, hasn't seemed to affect the size of the output
+        GZOutStream.SetLevel(9);
+        
         TarArchive TA = TarArchive.CreateOutputTarArchive(GZOutStream, Encoding.UTF8);
-
+        
         TA.RootPath = _Source.Replace('\\', '/');
 
         if (TA.RootPath.EndsWith("/"))
