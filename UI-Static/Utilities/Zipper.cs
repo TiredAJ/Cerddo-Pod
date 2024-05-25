@@ -14,7 +14,7 @@ public class Zipper
     public static void Extract(string _ZipSource, string _Destination)
     {
         //https://github.com/icsharpcode/SharpZipLib/wiki/GZip-and-Tar-Samples#anchorTar
-        Logger.Log($"Extracting {_ZipSource} to {_Destination}");
+        Logger.Log($"Extracting [{_ZipSource}] -> [{_Destination}]");
 
         try
         {

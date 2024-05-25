@@ -5,4 +5,33 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MixerStudio.Views.AppearanceView">
     
+    <UserControl.Styles>
+        <Style Selector="ComboBox">
+            <Setter Property="Margin" Value="4"/>
+        </Style>
+        <Style Selector="NumericUpDown">
+            <Setter Property="Margin" Value="4"/>
+        </Style>
+        <Style Selector="ColorPicker">
+            
+        </Style>
+    </UserControl.Styles>
+    
+    
+    <DockPanel>
+        <DockPanel DockPanel.Dock="Left" Background="Chartreuse" Width="150">
+            <ComboBox DockPanel.Dock="Top" HorizontalAlignment="Stretch">
+                
+            </ComboBox>
+            <NumericUpDown DockPanel.Dock="Top">
+                
+            </NumericUpDown>
+            <ColorPicker x:Name="colp_Picker" DockPanel.Dock="Top" 
+                         ColorModel="Rgba" ColorSpectrumShape="Ring" IsAlphaVisible="True"
+                         IsColorSpectrumSliderVisible="True"/>
+        </DockPanel>
+        <Border Background="Aqua">
+            
+        </Border>
+    </DockPanel>
 </UserControl>

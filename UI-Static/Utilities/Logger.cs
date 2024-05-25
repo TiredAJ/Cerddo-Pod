@@ -100,7 +100,7 @@ public sealed class Logger
     public static Exception LogThrow(string _Msg)
     {
         _PushLog(_Msg);
-        Thread.Sleep(250);
+        Thread.Sleep(500);
         return new Exception(_Msg);
     }
     
