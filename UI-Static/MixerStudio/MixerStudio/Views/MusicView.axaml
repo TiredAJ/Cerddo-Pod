@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:MixerStudio.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="MixerStudio.Views.MusicView"
+             x:DataType="vm:MusicViewModel"
+             DataContext="vm:MainViewModel">
+    <Design.DataContext>
+      <vm:MainViewModel />
+    </Design.DataContext>
+    
+    <UserControl.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Styles>
+    
+
+    <DockPanel Background="Aqua" LastChildFill="True">
+        <DockPanel Background="Blue" DockPanel.Dock="Left" Width="400" LastChildFill="False">
+            <StackPanel DockPanel.Dock="Top" Margin="4">
+                
+                <TextBlock>File Selection</TextBlock>
+                
+                <ListBox Background="Beige" Height="175"/>
+                
+            </StackPanel>
+            
+            <StackPanel DockPanel.Dock="Bottom" Margin="4">
+                
+                <TextBlock>Folder Selection</TextBlock>
+                
+                <ListBox Background="Lavender" Height="175"/>
+                
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,0">
+                    
+                    <Button>Remove Folder</Button>
+                    
+                    <Button>Add Folder</Button>
+                    
+                </StackPanel>
+            </StackPanel>
+        </DockPanel>
+        
+        <DockPanel Background="Brown">
+            <StackPanel Background="MediumSpringGreen" DockPanel.Dock="Left"
+                        Width="100">
+                <Button>Add</Button>
+                <Button>Remove</Button>
+                <Button>Move Up</Button>
+                <Button>Move Down</Button>
+                <Button>Move To Top</Button>
+                <Button>Move To Bottom</Button>
+            </StackPanel>
+            
+            <ListBox DockPanel.Dock="Right" Height="500" Background="Olive"/>
+            
+        </DockPanel>
+    </DockPanel>
+</UserControl>

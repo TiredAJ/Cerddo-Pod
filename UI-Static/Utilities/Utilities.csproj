@@ -13,6 +13,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0-preview.3.24172.9" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" Condition="'$(Configuration)' != 'Release'"/>
+    <PackageReference Include="NUnit" Version="4.1.0" Condition="'$(Configuration)' != 'Release'"/>
+    <PackageReference Include="NUnit.Analyzers" Version="4.2.0" Condition="'$(Configuration)' != 'Release'">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="SharpZipLib" Version="1.4.2" />
   </ItemGroup>
 

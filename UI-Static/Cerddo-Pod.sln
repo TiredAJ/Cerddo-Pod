@@ -11,6 +11,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Player", "Player\Player.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utilities", "Utilities\Utilities.csproj", "{932CA197-7CE9-4593-B335-32C3E099DF2D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MixerStudio", "MixerStudio\MixerStudio\MixerStudio.csproj", "{2161A732-C2DF-4F85-B997-532F9A585D5F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MixerStudio.Desktop", "MixerStudio\MixerStudio.Desktop\MixerStudio.Desktop.csproj", "{BA89BD04-1F77-488D-8BC6-8C5923820C6F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cerddo_Pod", "Cerddo_Pod", "{13A2FCE1-E34F-4946-A8F8-F02F6C2C59D7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MixerStudio", "MixerStudio", "{29B2CF28-AA02-4341-A995-77F0E4F06C92}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,11 +41,37 @@ Global
 		{932CA197-7CE9-4593-B335-32C3E099DF2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{932CA197-7CE9-4593-B335-32C3E099DF2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{932CA197-7CE9-4593-B335-32C3E099DF2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2161A732-C2DF-4F85-B997-532F9A585D5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2161A732-C2DF-4F85-B997-532F9A585D5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2161A732-C2DF-4F85-B997-532F9A585D5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2161A732-C2DF-4F85-B997-532F9A585D5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF0DCF88-AE6F-4EAB-BDBB-1074C23A8067}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF0DCF88-AE6F-4EAB-BDBB-1074C23A8067}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF0DCF88-AE6F-4EAB-BDBB-1074C23A8067}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF0DCF88-AE6F-4EAB-BDBB-1074C23A8067}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA89BD04-1F77-488D-8BC6-8C5923820C6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA89BD04-1F77-488D-8BC6-8C5923820C6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA89BD04-1F77-488D-8BC6-8C5923820C6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA89BD04-1F77-488D-8BC6-8C5923820C6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49D324DC-819C-4F0A-9A88-6D679A2034BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49D324DC-819C-4F0A-9A88-6D679A2034BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49D324DC-819C-4F0A-9A88-6D679A2034BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49D324DC-819C-4F0A-9A88-6D679A2034BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEDBB4EA-8F3A-476F-AFC3-1D46B0823EE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEDBB4EA-8F3A-476F-AFC3-1D46B0823EE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEDBB4EA-8F3A-476F-AFC3-1D46B0823EE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEDBB4EA-8F3A-476F-AFC3-1D46B0823EE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {70C35138-4675-47A3-9645-491E14F90F47}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2933CA2F-A244-4C12-8461-EBBA7834D1D0} = {13A2FCE1-E34F-4946-A8F8-F02F6C2C59D7}
+		{6607D733-6391-4ED4-BAF2-DE210B9F3B3A} = {13A2FCE1-E34F-4946-A8F8-F02F6C2C59D7}
+		{2161A732-C2DF-4F85-B997-532F9A585D5F} = {29B2CF28-AA02-4341-A995-77F0E4F06C92}
+		{BA89BD04-1F77-488D-8BC6-8C5923820C6F} = {29B2CF28-AA02-4341-A995-77F0E4F06C92}
 	EndGlobalSection
 EndGlobal

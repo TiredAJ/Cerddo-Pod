@@ -44,7 +44,7 @@ public sealed class Logger
     /// <returns>Failed <see cref="Result"/> containing _Msg</returns>
     public static Result LogResult(DefMsg _Msg)
     {
-        _PushLog(_Msg.ToString());
+        _PushLog(_Msg.StrDisplay());
         return Result.Failure(_Msg.StrDisplay());
     }
     
@@ -66,7 +66,7 @@ public sealed class Logger
     /// <returns>Failed <see cref="Result"/> containing _Msg</returns>
     public static Result<T> LogResult<T>(DefMsg _Msg)
     {
-        _PushLog(_Msg.ToString());
+        _PushLog(_Msg.StrDisplay());
         return Result.Failure<T>(_Msg.StrDisplay());
     }
 
