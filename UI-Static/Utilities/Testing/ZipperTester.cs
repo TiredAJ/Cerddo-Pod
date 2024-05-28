@@ -3,7 +3,8 @@ using NUnit.Framework.Api;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
-using Utilities;
+using Utilities.Logging;
+using Utilities.Zipping;
 
 namespace Player.Testing;
 

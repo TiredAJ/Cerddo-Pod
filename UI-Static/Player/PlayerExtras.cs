@@ -1,6 +1,6 @@
 ﻿using ManagedBass;
 using ReactiveUI;
-using Utilities;
+using Utilities.Logging;
 using CSharpFunctionalExtensions;
 
 namespace Player;

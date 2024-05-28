@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Utilities;
+namespace Utilities.Platformer;
 
 public class Platformer
 {

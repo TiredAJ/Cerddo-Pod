@@ -1,8 +1,9 @@
 ﻿using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Tar;
 using System.Text;
+using Utilities.Logging;
 
-namespace Utilities;
+namespace Utilities.Zipping;
 
 public class Zipper
 {

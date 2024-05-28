@@ -3,7 +3,7 @@ using Avalonia.Platform.Storage;
 using Player;
 using ReactiveUI;
 using System.Linq;
-using Utilities;
+using Utilities.Logging;
 
 namespace Cerddo_Pod.ViewModels;
 

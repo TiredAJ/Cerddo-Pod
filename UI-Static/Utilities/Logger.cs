@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
-namespace Utilities;
+namespace Utilities.Logging;
 
 public sealed class Logger
 {

@@ -4,7 +4,9 @@ using ManagedBass;
 using ManagedBass.Flac;
 using Player.Utils;
 using System.Diagnostics;
-using Utilities;
+using Utilities.Logging;
+using Utilities.Platformer;
+using Utilities.Zipping;
 using ReactiveUI;
 
 namespace Player;
