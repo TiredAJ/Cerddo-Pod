@@ -4,8 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:MI="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:Ut="clr-namespace:MixerStudio.Utils"
+             xmlns:vm="clr-namespace:MixerStudio.ViewModels"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="500"
-             x:Class="MixerStudio.Views.AppearanceView">
+             x:Class="MixerStudio.Views.AppearanceView"
+             x:DataType="vm:AppearanceViewModel">
     
     <UserControl.Styles>
         <Style Selector="ComboBox">
@@ -30,7 +32,7 @@
     
     
     <DockPanel>
-        <DockPanel DockPanel.Dock="Left" Background="Chartreuse" Width="150">
+        <DockPanel DockPanel.Dock="Left" Background="Chartreuse" Width="200">
             <ComboBox DockPanel.Dock="Top" HorizontalAlignment="Stretch">
                 
             </ComboBox>
@@ -44,7 +46,7 @@
         <Border>
             <!--Top level-->
 			<DockPanel x:Name="dckpnl_SuperPanel" Background="Bisque" LastChildFill="True"
-			           Width="800" Height="300">
+			           Width="800" Height="300" Initialized="Dckpnl_SuperPanel_OnInitialized">
 				<DockPanel.Styles>
 						<!--TextBlocks-->
 						<Style Selector="TextBlock">
