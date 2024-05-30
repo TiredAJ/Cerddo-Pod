@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cerddo_Pod", "Cerddo_Pod", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MixerStudio", "MixerStudio", "{29B2CF28-AA02-4341-A995-77F0E4F06C92}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{FD1659A1-F08F-48FC-8198-4B2D90AAE354}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{EEDBB4EA-8F3A-476F-AFC3-1D46B0823EE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEDBB4EA-8F3A-476F-AFC3-1D46B0823EE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEDBB4EA-8F3A-476F-AFC3-1D46B0823EE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD1659A1-F08F-48FC-8198-4B2D90AAE354}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD1659A1-F08F-48FC-8198-4B2D90AAE354}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD1659A1-F08F-48FC-8198-4B2D90AAE354}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD1659A1-F08F-48FC-8198-4B2D90AAE354}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

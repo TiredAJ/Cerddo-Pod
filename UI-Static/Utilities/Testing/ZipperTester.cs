@@ -11,6 +11,7 @@ namespace Player.Testing;
 [TestFixture]
 public class ZipperTester
 {
+    //passed - 30/05/24 @ 22:19
     [Test]
     public void ExtractTester()
     {
@@ -47,6 +48,7 @@ public class ZipperTester
         );
     }
 
+    //passed - 30/05/24 @ 22:19
     [Test]
     public void CompressTester()
     {

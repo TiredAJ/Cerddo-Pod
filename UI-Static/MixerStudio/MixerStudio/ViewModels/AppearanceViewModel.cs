@@ -7,6 +7,8 @@ using ReactiveUI.Fody.Helpers;
 using System;
 using System.Threading.Tasks;
 using Utilities.Logging;
+using Common.Appearance;
+using MixerStudio.Utils;
 
 namespace MixerStudio.ViewModels;
 
@@ -42,10 +44,10 @@ public class AppearanceViewModel : ViewModelBase
                         else
                         {
                             if (C.GetType().GetProperty("Background") is ISolidColorBrush ISCB_bg)
-                            { CS.Background = ISCB_bg.Color; }
+                            { CS.Background = ISCB_bg.Color.AvColToCol(); }
 
                             if (C.GetType().GetProperty("Foreground") is ISolidColorBrush ISCB_fg)
-                            { CS.Foreground = ISCB_fg.Color; }
+                            { CS.Foreground = ISCB_fg.Color.AvColToCol(); }
                         }
                     }
                     else
@@ -62,10 +64,3 @@ public class AppearanceViewModel : ViewModelBase
     }
 }
 
-public struct ControlSpecs
-{
-    public Maybe<FontFamily> Font;
-    public Maybe<float> FontSize;
-    public Maybe<Color> Foreground;
-    public Maybe<Color> Background;
-}
