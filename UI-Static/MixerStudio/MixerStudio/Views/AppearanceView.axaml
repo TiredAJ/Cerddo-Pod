@@ -5,9 +5,10 @@
              xmlns:MI="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:Ut="clr-namespace:MixerStudio.Utils"
              xmlns:vm="clr-namespace:MixerStudio.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="500"
+             mc:Ignorable="d" d:DesignWidth="1300" d:DesignHeight="500"
              x:Class="MixerStudio.Views.AppearanceView"
-             x:DataType="vm:AppearanceViewModel">
+             x:DataType="vm:AppearanceViewModel"
+             x:CompileBindings="True">
     
     <UserControl.Styles>
         <Style Selector="ComboBox">
@@ -19,6 +20,7 @@
         <Style Selector="ColorPicker">
             
         </Style>
+	    
 	    <!--Icons-->
 	    <Style Selector="MI|MaterialIcon">
 		    <Setter Property="Foreground" Value="Navy"/>
@@ -28,60 +30,81 @@
 		    <Setter Property="HorizontalAlignment" Value="Center"/>
 		    <Setter Property="VerticalAlignment" Value="Center"/>
 	    </Style>
+	    
+	    <!--TextBlocks-->
+	    <Style Selector="TextBlock">
+		    <Setter Property="Foreground" Value="Black"/>
+		    <Setter Property="FontSize" Value="20"/>
+		    <Setter Property="Margin" Value="4"/>
+	    </Style>
+	    <Style Selector="TextBlock.H">
+		    <Setter Property="FontSize" Value="25"/>
+	    </Style>
+				
+	    <!--Buttons-->
+	    <Style Selector="Button">
+		    <Setter Property="FontSize" Value="18"/>
+		    <Setter Property="HorizontalAlignment" Value="Center"/>
+		    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+	    </Style>
     </UserControl.Styles>
-    
+	
+    <!--
+		Trying out a new control naming scheme, effectively like namespaces
+		(name of parent *panel* control, lowercase)_(type, all caps)_(name of control, pascal case)
+		so a button within a dockpanel (DCKPNL_Main) would be
+				x:Name="main_BTN_OpenFile"
+	-->
     
     <DockPanel>
-        <DockPanel DockPanel.Dock="Left" Background="Chartreuse" Width="200">
-            <ComboBox DockPanel.Dock="Top" HorizontalAlignment="Stretch">
+        <DockPanel x:Name="DKPNL_Options" DockPanel.Dock="Left" Background="Chartreuse" Width="400" LastChildFill="True">
+			<ComboBox x:Name="options_CMBX_Font" DockPanel.Dock="Top" HorizontalAlignment="Stretch"
+	                  SelectedItem="{Binding SelectedFont}">
+	            <ComboBox.ItemTemplate>
+		            <DataTemplate>
+			            <TextBlock/>
+		            </DataTemplate>
+	            </ComboBox.ItemTemplate>
                 
             </ComboBox>
-            <NumericUpDown DockPanel.Dock="Top">
-                
-            </NumericUpDown>
-            <ColorPicker x:Name="colp_Picker" DockPanel.Dock="Top" 
-                         ColorModel="Rgba" ColorSpectrumShape="Ring" IsAlphaVisible="True"
-                         IsColorSpectrumSliderVisible="True"/>
+            <NumericUpDown x:Name="options_NUD_FontSize" DockPanel.Dock="Top"
+                           FontSize="20" Minimum="10" Maximum="60" Value="5"/>
+	        <StackPanel Orientation="Horizontal" Height="50">
+		        <RadioButton Content="Background" Height="20"/>
+		        <RadioButton Content="Foreground"/>
+	        </StackPanel>
+	        <Border x:Name="BDR_Colours" Margin="10" Background="DarkGray">
+				<ColorView Width="{Binding #BDR_Colours.Width}"
+							Height="{Binding #BDR_Colours.Height}"
+							FontSize="12" />
+		        
+	        </Border>
+	        
         </DockPanel>
         <Border>
             <!--Top level-->
-			<DockPanel x:Name="dckpnl_SuperPanel" Background="Bisque" LastChildFill="True"
-			           Width="800" Height="300" Initialized="Dckpnl_SuperPanel_OnInitialized">
-				<DockPanel.Styles>
-						<!--TextBlocks-->
-						<Style Selector="TextBlock">
-							<Setter Property="Foreground" Value="Black"/>
-							<Setter Property="FontSize" Value="20"/>
-							<Setter Property="Margin" Value="4"/>
-						</Style>
-						<Style Selector="TextBlock.H">
-							<Setter Property="FontSize" Value="25"/>
-						</Style>
-				
-						<!--Buttons-->
-						<Style Selector="Button">
-							<Setter Property="FontSize" Value="18"/>
-							<Setter Property="HorizontalAlignment" Value="Center"/>
-							<Setter Property="HorizontalContentAlignment" Value="Center"/>
-						</Style>
-				</DockPanel.Styles>
+			<DockPanel x:Name="DCKPNL_SuperPanel" Background="Bisque" LastChildFill="True"
+			           Width="800" Height="300">
 				
 				<!--Volume Panel-->
-				<DockPanel x:Name="dckpnl_Volume" HorizontalAlignment="Right" DockPanel.Dock="Right">
-					<TextBlock Text="{Binding #sldr_Volume.Value, 
+				<DockPanel x:Name="DCKPNL_Volume" HorizontalAlignment="Right" DockPanel.Dock="Right">
+					<TextBlock x:Name="volume_TXT_VolumePerc" 
+					           Text="{Binding #volume_SLDR_Volume.Value, 
 									Converter={x:Static Ut:ConvertersUtils.PercentageConverter}}" 
 					           HorizontalAlignment="Center" VerticalAlignment="Center" Width="40" 
 					           TextAlignment="Center" DockPanel.Dock="Top"/>
-					<Slider x:Name="sldr_Volume" Orientation="Vertical" Maximum="1500" Minimum="0" 
+					<Slider x:Name="volume_SLDR_Volume" Orientation="Vertical" Maximum="1500" Minimum="0" 
 					        HorizontalAlignment="Center" VerticalAlignment="Stretch" 
 					        Value="20" 
 					        Margin="0,4,0,16"/>
 				</DockPanel>
 
 				<!--Menu bar-->
-				<StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Height="30">
-					<Button Background="Transparent">
-						<MI:MaterialIcon Kind="FolderOpen" VerticalAlignment="Center" Width="24" Height="24"/>
+				<StackPanel x:Name="stkpnl_MenuBar" DockPanel.Dock="Top" Orientation="Horizontal" 
+				            Height="30">
+					<Button x:Name="menu_BTN_OpenFolder" Background="Transparent">
+						<MI:MaterialIcon x:Name="menu_MI_OpenFolder" Kind="FolderOpen"
+						                 VerticalAlignment="Center" Width="24" Height="24"/>
 					</Button>
 				</StackPanel>
 				
@@ -89,53 +112,54 @@
 				<DockPanel x:Name="stkpnl_Main" Background="Cyan" LastChildFill="True">
 					
 					<!--Duration panel-->
-					<DockPanel DockPanel.Dock="Bottom">
-						<DockPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch" LastChildFill="False">
-							<TextBlock DockPanel.Dock="Left" x:Name="txt_Duration" VerticalAlignment="Center"
+					<DockPanel x:Name="main_DCKPNL_Duration" DockPanel.Dock="Bottom">
+						<DockPanel x:Name="duration_DCKPNL_DurationText" DockPanel.Dock="Top" HorizontalAlignment="Stretch" LastChildFill="False">
+							<TextBlock x:Name="durationtext_TXT_Duration" DockPanel.Dock="Left" 
+							           VerticalAlignment="Center"
 							           Text="0:42"
 							           Width="100" TextAlignment="Center" Margin="4,4,4,-4"/>
-							<TextBlock DockPanel.Dock="Right" x:Name="txt_Position" VerticalAlignment="Center"
-							           Text="1:40" 
+							<TextBlock x:Name="durationtext_TXT_Position" DockPanel.Dock="Right"
+							           VerticalAlignment="Center" Text="1:40"
 							           Width="100" TextAlignment="Center" Margin="4,4,4,-4"/>
 							
 						</DockPanel>
-						<Slider x:Name="sldr_Progress" Maximum="100" Minimum="0" 
+						<Slider x:Name="duration_SLDR_Progress" Maximum="100" Minimum="0" 
 						        Value="42" HorizontalAlignment="Stretch"
 						        Margin="16,-8, 16,-4"/>
 					</DockPanel>
 					
 					<!--Display Panel-->
-					<DockPanel x:Name="stkpnl_Content" Background="Fuchsia" VerticalAlignment="Stretch"
+					<DockPanel x:Name="DCKPNL_Content" Background="Fuchsia" VerticalAlignment="Stretch"
 					           HorizontalAlignment="Stretch" LastChildFill="True">
 						<!--Album art-->
-						<Border Background="Green" DockPanel.Dock="Left" Margin="4">
-							<Image x:Name="img_CoverImg"
+						<Border x:Name="content_BDR_AlbumBackground" Background="Green" DockPanel.Dock="Left" Margin="4">
+							<Image x:Name="content_IMG_CoverImg"
 							       Source="avares://MixerStudio/Assets/nessie_guitar.png"/>
 						</Border>
 						
 						<!--Content Panel-->
-						<DockPanel x:Name="dkpnl_Content" Margin="4" HorizontalAlignment="Stretch" 
+						<DockPanel x:Name="content_DCKPNL_MediaContent" Margin="4" HorizontalAlignment="Stretch" 
 						           LastChildFill="True">
-							
+							<!--57753-->
 							<!--Media Controls-->
-							<StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom"
+							<StackPanel x:Name="mediacontent_STKPNL_MediaControls" Orientation="Horizontal" DockPanel.Dock="Bottom"
 							            HorizontalAlignment="Center">
-								<Button>
+								<Button x:Name="mediacontent_BTN_SkipPrev">
 									<MI:MaterialIcon Kind="SkipPrevious"/> 
 								</Button>
-								<Button>
+								<Button x:Name="mediacontent_BTN_PlayPause">
 									<MI:MaterialIcon Kind="PlayPause"/> 
 								</Button>
-								<Button>
+								<Button x:Name="mediacontent_BTN_SkipNext">
 									<MI:MaterialIcon Kind="SkipNext"/> 
 								</Button>
 							</StackPanel>
-							<TextBlock x:Name="txt_Artist" Text="Nessie"
+							<TextBlock x:Name="mediacontent_TXT_Artist" Text="Nessie"
 							           TextAlignment="Left" DockPanel.Dock="Bottom"/>
 							
-							<TextBlock x:Name="txt_SongName" Classes="H" TextAlignment="Center" 
-							           VerticalAlignment="Center" HorizontalAlignment="Center" 
-							           Text="The Loch" 
+							<TextBlock x:Name="mediacontent_TXT_SongName" Classes="H"
+							           TextAlignment="Center" VerticalAlignment="Center"
+							           HorizontalAlignment="Center" Text="The Loch" 
 							           TextWrapping="WrapWithOverflow" Margin="10"/>
 						</DockPanel>
 					</DockPanel>

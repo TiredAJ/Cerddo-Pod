@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Media.Fonts;
 using Avalonia.Threading;
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
@@ -20,12 +21,30 @@ public class AppearanceViewModel : ViewModelBase
     [Reactive]
     public (Control, ControlSpecs) Current { get; set; }
 
+    [Reactive]
+    public List<FontFamily> AvailableFonts { get; set; }
+    
+    [Reactive]
+    public FontFamily SelectedFont { get; set; }
+    
     public AppearanceViewModel()
     {
-        
+        LoadFonts();
     }
 
-    
+    private void LoadFonts()
+    {
+        List<FontFamily> Fonts = new();
+
+        Task.Run(() =>
+        {
+            //doesn't work
+            var FC = new FontFamily("").FamilyNames;
+            
+            Debug.WriteLine($"Found fonts: {FC.Count}");
+        });
+    }
+
     public async Task InitControls(Panel _Parent)
     {
         Debug.WriteLine($"Panel name: {_Parent.Name}");
