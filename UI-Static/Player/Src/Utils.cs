@@ -39,7 +39,7 @@ public static class Extensions
 
     public static List<SongData> Shuffle(this List<SongData> _Arr)
     {//https://stackoverflow.com/a/110570/19306828
-        Random RNG = new Random((int)DateTime.Now.Ticks);
+        Random RNG = new((int)DateTime.Now.Ticks);
         
         int n = _Arr.Count;
         while (n > 1) 

@@ -40,12 +40,17 @@
 	    <Style Selector="TextBlock.H">
 		    <Setter Property="FontSize" Value="25"/>
 	    </Style>
-				
+
 	    <!--Buttons-->
 	    <Style Selector="Button">
 		    <Setter Property="FontSize" Value="18"/>
 		    <Setter Property="HorizontalAlignment" Value="Center"/>
 		    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+	    </Style>
+	    
+	    <Style Selector="ToolTip">
+		    <Setter Property="Background" Value="LightGray"/>
+		    <Setter Property="Foreground" Value="Black"/>
 	    </Style>
     </UserControl.Styles>
 	
@@ -58,25 +63,17 @@
     
     <DockPanel>
         <DockPanel x:Name="DKPNL_Options" DockPanel.Dock="Left" Background="Chartreuse" Width="400" LastChildFill="True">
-			<ComboBox x:Name="options_CMBX_Font" DockPanel.Dock="Top" HorizontalAlignment="Stretch"
-	                  SelectedItem="{Binding SelectedFont}">
-	            <ComboBox.ItemTemplate>
-		            <DataTemplate>
-			            <TextBlock/>
-		            </DataTemplate>
-	            </ComboBox.ItemTemplate>
-                
-            </ComboBox>
-            <NumericUpDown x:Name="options_NUD_FontSize" DockPanel.Dock="Top"
+			<NumericUpDown x:Name="options_NUD_FontSize" DockPanel.Dock="Top"
                            FontSize="20" Minimum="10" Maximum="60" Value="5"/>
-	        <StackPanel Orientation="Horizontal" Height="50">
-		        <RadioButton Content="Background" Height="20"/>
-		        <RadioButton Content="Foreground"/>
+	        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Height="50"
+	                    Background="Gray" HorizontalAlignment="Center">
+		        <RadioButton Content="Background" Margin="4"/>
+		        <RadioButton Content="Foreground" Margin="4"/>
 	        </StackPanel>
 	        <Border x:Name="BDR_Colours" Margin="10" Background="DarkGray">
 				<ColorView Width="{Binding #BDR_Colours.Width}"
 							Height="{Binding #BDR_Colours.Height}"
-							FontSize="12" />
+							FontSize="12" Color="{Binding }"/>
 		        
 	        </Border>
 	        
@@ -84,7 +81,8 @@
         <Border>
             <!--Top level-->
 			<DockPanel x:Name="DCKPNL_SuperPanel" Background="Bisque" LastChildFill="True"
-			           Width="800" Height="300">
+			           Width="800" Height="300"
+			           Initialized="DCKPNL_SuperPanel_OnInitialized">
 				
 				<!--Volume Panel-->
 				<DockPanel x:Name="DCKPNL_Volume" HorizontalAlignment="Right" DockPanel.Dock="Right">

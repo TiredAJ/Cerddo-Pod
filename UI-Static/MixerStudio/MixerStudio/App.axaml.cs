@@ -3,6 +3,8 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using MixerStudio.ViewModels;
 using MixerStudio.Views;
+using System.Reflection.Metadata;
+using static Utilities.Logging.LoggerBuilder;
 
 namespace MixerStudio;
 
@@ -23,6 +25,23 @@ public partial class App : Application
         {
             singleViewPlatform.MainView = new MusicView { DataContext = new MainViewModel() };
         }
+
+        _ = Init()
+            .UseDefaultLoc()
+            .LogName("MixerStudio", "Appearance")
+            .BuildAndStore();
+        _ = Init()
+            .UseDefaultLoc()
+            .LogName("MixerStudio", "Music")
+            .BuildAndStore();
+        _ = Init()
+            .UseDefaultLoc()
+            .LogName("MixerStudio", "Export")
+            .BuildAndStore();
+        _ = Init()
+            .UseDefaultLoc()
+            .LogName("MixerStudio", "Misc")
+            .BuildAndStore();
 
         base.OnFrameworkInitializationCompleted();
     }

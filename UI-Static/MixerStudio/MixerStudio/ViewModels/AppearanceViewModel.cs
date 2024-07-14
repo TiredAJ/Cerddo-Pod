@@ -8,43 +8,28 @@ using ReactiveUI.Fody.Helpers;
 using System;
 using System.Threading.Tasks;
 using Utilities.Logging;
+using static Utilities.Logging.LoggerBuilder;
 using Common.Appearance;
 using MixerStudio.Utils;
 using System.Diagnostics;
+using System.Linq;
 
 namespace MixerStudio.ViewModels;
 
 public class AppearanceViewModel : ViewModelBase
 {
     private Dictionary<string, ControlSpecs> IntControls = new();
+    private Logger Logger;
 
     [Reactive]
     public (Control, ControlSpecs) Current { get; set; }
-
-    [Reactive]
-    public List<FontFamily> AvailableFonts { get; set; }
-    
-    [Reactive]
-    public FontFamily SelectedFont { get; set; }
     
     public AppearanceViewModel()
-    {
-        LoadFonts();
-    }
+    { Logger = Loggers["MixerStudio/Appearance"]; }
 
-    private void LoadFonts()
-    {
-        List<FontFamily> Fonts = new();
-
-        Task.Run(() =>
-        {
-            //doesn't work
-            var FC = new FontFamily("").FamilyNames;
-            
-            Debug.WriteLine($"Found fonts: {FC.Count}");
-        });
-    }
-
+    public void Command_InitControls(Panel _Parent)
+    { InitControls(_Parent); }
+    
     public async Task InitControls(Panel _Parent)
     {
         Debug.WriteLine($"Panel name: {_Parent.Name}");
@@ -72,7 +57,7 @@ public class AppearanceViewModel : ViewModelBase
             if (C.Name is string Name)
             {
                 if (!IntControls.TryAdd(Name, new ControlSpecs()))
-                { Logger.Log($"Duplicate control name found: [{C.Name}]"); }
+                { Logger.Error($"Duplicate control name found: [{C.Name}]"); }
                 else
                 {
                     if (C.GetType().GetProperty("Background") is ISolidColorBrush ISCB_bg)
@@ -85,7 +70,7 @@ public class AppearanceViewModel : ViewModelBase
                 }
             }
             else
-            { Logger.Log($"Control [{C.GetType().FullName}] doesn't have a name!"); }
+            { Logger.Error($"Control [{C.GetType().FullName}] doesn't have a name!"); }
         }
     }
 

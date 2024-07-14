@@ -1,4 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
+using Newtonsoft.Json.Serialization;
+using NUnit.Framework.Constraints;
+using System.Data;
 using System.Globalization;
 using System.Numerics;
 using System.Security.Cryptography.X509Certificates;
@@ -15,6 +18,11 @@ public struct ControlSpecs
     public Maybe<float> FontSize;
     public Maybe<Colour> Foreground;
     public Maybe<Colour> Background;
+    public Colour Default;
+
+    //Forces each control to have a default colour
+    public ControlSpecs(Colour _Default)
+    { Default = _Default; }
 }
 
 public struct Colour
@@ -81,21 +89,29 @@ public struct Colour
         G = _G;
     }
 
-    public void FromHex(string _HexARGB)
+    public Result FromHex(string _HexARGB)
     {
         string HexStr = _HexARGB
                             .Replace("#", "")
                             .Trim();
 
+        if (HexStr.Length is not (6 or 8))
+        { return Result.Failure("Hex input must be 6 or 8 characters."); }
+
         List<byte> Vals = new();
 
-        for (int i = 0; i < HexStr.Length; i+=2)
-        { 
-            Vals.Add(byte.Parse(
-                            HexStr.Substring(i, 2), 
-                            NumberStyles.HexNumber)
-                            );
+        try
+        {
+            for (int i = 0; i < HexStr.Length; i+=2)
+            {
+                Vals.Add(byte.Parse(
+                    HexStr.Substring(i, 2), 
+                    NumberStyles.HexNumber)
+                );
+            }
         }
+        catch (Exception EXC)
+        { return Result.Failure(EXC.ToString()); }
 
         if (Vals.Count == 3)
         {
@@ -111,13 +127,19 @@ public struct Colour
             G = Vals[2];
             B = Vals[3];
         }
+
+        return Result.Success();
     }
 
-    public static Colour MakeFromHex(string _HexARGB)
+    public static Result<Colour> MakeFromHex(string _HexARGB)
     {
         var C = new Colour();
-        C.FromHex(_HexARGB);
-        return C;
+        var R = C.FromHex(_HexARGB);
+
+        if (R.IsFailure)
+        { return Result.Failure<Colour>(R.Error); }
+        else
+        { return Result.Success<Colour>(C); }
     }
 
     public string ToHex()

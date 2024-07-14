@@ -7,6 +7,11 @@ namespace Utilities.Zipping;
 
 public class Zipper
 {
+    private static Logger Log;
+
+    public Zipper()
+    { Log = LoggerBuilder.Init().UseDefaultLoc().LogName("Zipper").Build(); }
+    
     /// <summary>
     /// Extracts the input file to the output directory
     /// </summary>
@@ -15,7 +20,7 @@ public class Zipper
     public static void Extract(string _ZipSource, string _Destination)
     {
         //https://github.com/icsharpcode/SharpZipLib/wiki/GZip-and-Tar-Samples#anchorTar
-        Logger.Log($"Extracting [{_ZipSource}] -> [{_Destination}]");
+        Log.Info($"Extracting [{_ZipSource}] -> [{_Destination}]");
 
         try
         {
@@ -24,16 +29,16 @@ public class Zipper
                 TarArchive TA = TarArchive.CreateInputTarArchive(GZS, Encoding.UTF8);
                 TA.ExtractContents(_Destination);
                 TA.Close();
-                Logger.Log("Closing archive.");
+                Log.Info("Closing archive.");
             }
         }
         catch (Exception EXC)
-        { throw Logger.LogThrow(EXC.Message); }        
+        { throw Log.FatalThrow(EXC.Message); }        
     }
 
     public static void Compress(string _ZipDestination, string _Source)
     {
-        Logger.Log($"Compressing folder to [{_ZipDestination}].");
+        Log.Info($"Compressing folder to [{_ZipDestination}].");
         
         Stream OutStream = File.Create(_ZipDestination);
         var GZOutStream = new GZipOutputStream(OutStream);
@@ -52,7 +57,7 @@ public class Zipper
         
         TA.Close();
         
-        Logger.Log("Closing archive.");
+        Log.Info("Closing archive.");
     }
 
     private static void AddDirectoryFilesToTar(TarArchive TA, string _Source)
@@ -65,7 +70,7 @@ public class Zipper
         TarEntry TE = TarEntry.CreateEntryFromFile(_Source);
         TA.WriteEntry(TE, false);
 
-        Logger.Log("Adding files to archive.");
+        Log.Info("Adding files to archive.");
         
         var Files = Directory.GetFiles(_Source);
 
@@ -75,6 +80,6 @@ public class Zipper
             TA.WriteEntry(TE, false);
         }
         
-        Logger.Log($"Finished adding {Files.Length} file(s) to archive.");
+        Log.Info($"Finished adding {Files.Length} file(s) to archive.");
     }
 }

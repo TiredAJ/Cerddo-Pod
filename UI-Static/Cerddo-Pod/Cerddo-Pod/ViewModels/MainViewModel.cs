@@ -4,6 +4,7 @@ using Player;
 using ReactiveUI;
 using System.Linq;
 using Utilities.Logging;
+using static Utilities.Logging.LoggerBuilder;
 
 namespace Cerddo_Pod.ViewModels;
 
@@ -11,11 +12,15 @@ public class MainViewModel : ViewModelBase
 {
     private static FolderPickerOpenOptions FPOO = new FolderPickerOpenOptions()
     { Title = "Mix folder to open", AllowMultiple = false };
+
+    private static Logger Log;
     
     public SAPlayer SAP { get; private set; } = new();
 
     public MainViewModel()
-    { }
+    {
+        Log = Loggers["CerddoPod/UI"];
+    }
 
     public MainViewModel(string _Loc)
     { SAP.LoadMix(_Loc); }
@@ -37,19 +42,19 @@ public class MainViewModel : ViewModelBase
         var ISP = TopLevel.GetTopLevel(_Sender as Button)?.StorageProvider;
 
         if (ISP is null)
-        { Logger.Log("ISP returned null!"); }
+        { Log.Error("ISP returned null!"); }
         
         FPOO.SuggestedStartLocation = await ISP.TryGetWellKnownFolderAsync(WellKnownFolder.Downloads);
         
         if (!ISP.CanOpen)
-        { Logger.Log("Not allowed to open folders!"); return; }
+        { Log.Error("Not allowed to open folders!"); return; }
 
         var FolderLoc = await ISP.OpenFolderPickerAsync(FPOO);
 
         if (FolderLoc.Count > 0 &&  FolderLoc.First().TryGetLocalPath() is { } LP)
         { SAP.LoadMix(LP); }
         else
-        { Logger.Log("FolderLoc count error!"); }        
+        { Log.Error("FolderLoc count error!"); }        
     }
 
     public void Closing()

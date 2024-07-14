@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Utilities.Platformer;
+namespace Utilities.Platforms;
 
 public class Platformer
 {
@@ -65,6 +65,22 @@ public class Platformer
                 return OSArch.Arm64;
             default:
                 return OSArch.Other;
+        }
+    }
+
+    public static string GetOSLogLocation()
+    {
+        switch (GetPlatform())
+        {
+            case OSPlat.Linux:
+            case OSPlat.OSX:
+            case OSPlat.FreeBSD:
+                return "/var/log";
+            case OSPlat.Windows:
+                return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            case OSPlat.Other:
+            default:
+                return Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         }
     }
 }

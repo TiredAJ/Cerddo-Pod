@@ -1,7 +1,8 @@
 ﻿using ManagedBass;
 using ReactiveUI;
-using Utilities.Logging;
+using static Utilities.Logging.LoggerBuilder;
 using CSharpFunctionalExtensions;
+using Utilities.Logging;
 
 namespace Player;
 
@@ -24,7 +25,12 @@ public class PlayerBase : ReactiveObject
 
     #region Private Members
     /// <summary>
-    /// List of loaded songs
+    /// Logging object. 
+    /// </summary>
+    protected static Logger Log;
+    
+    /// <summary>
+    /// List of loaded songs.
     /// </summary>
     protected List<SongData> Tunes = [];
     /// <summary>
@@ -99,13 +105,16 @@ public class Syncer
 
 struct MPData
 {
+    private static Logger Log;
+    
     public MPData()
     {
+        Log = Loggers["CerddoPod/MPData"];
     }
 
     public static Result<MPData> LoadFromFile(string _F)
     {
-        return Logger.LogResult<MPData>("Not implemented!");
+        return Log.ErrorResult<MPData>("Not implemented!");
     }
 }
 

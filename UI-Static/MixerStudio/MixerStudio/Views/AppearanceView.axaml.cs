@@ -11,15 +11,10 @@ namespace MixerStudio.Views
         public AppearanceView()
         {
             InitializeComponent();
-
-            DCKPNL_SuperPanel.Initialized += Dckpnl_SuperPanel_OnInitialized;
         }
 
-        private void Dckpnl_SuperPanel_OnInitialized(object? _Sender, EventArgs e)
+        private void DCKPNL_SuperPanel_OnInitialized(object? sender, EventArgs e)
         {
-            if (_Sender is null)
-            { return; }
-            (this.DataContext as AppearanceViewModel).InitControls(_Sender as Panel);
             
         }
     }
