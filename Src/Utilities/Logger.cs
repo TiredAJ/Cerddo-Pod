@@ -65,7 +65,6 @@ public sealed partial class Logger
         return Result.Success();
     }
     
-    
     /// <summary>
     /// Pushes an error to the log. User should investigate/report.
     /// </summary>
