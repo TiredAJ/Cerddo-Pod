@@ -10,7 +10,7 @@ namespace Cerddo_Pod.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
-    private static FolderPickerOpenOptions FPOO = new FolderPickerOpenOptions()
+    private static FolderPickerOpenOptions FPOO = new()
     { Title = "Mix folder to open", AllowMultiple = false };
 
     private static Logger Log;
@@ -42,7 +42,7 @@ public class MainViewModel : ViewModelBase
         var ISP = TopLevel.GetTopLevel(_Sender as Button)?.StorageProvider;
 
         if (ISP is null)
-        { Log.Error("ISP returned null!"); }
+        { Log.Error("ISP returned null!"); return; }
         
         FPOO.SuggestedStartLocation = await ISP.TryGetWellKnownFolderAsync(WellKnownFolder.Downloads);
         

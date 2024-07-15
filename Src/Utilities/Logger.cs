@@ -65,6 +65,12 @@ public sealed partial class Logger
         return Result.Success();
     }
     
+    public Result<T> InfoResult<T>(T _Msg)
+    {
+        Info(_Msg.ToString());
+        return Result.Success<T>(_Msg);
+    }
+    
     /// <summary>
     /// Pushes an error to the log. User should investigate/report.
     /// </summary>
@@ -167,5 +173,20 @@ public sealed partial class Logger
     public Exception FatalThrow(DefMsg _Msg)
     {
         return FatalThrow(_Msg.ToString());
+    }
+}
+
+public sealed partial class Logger
+{
+    /// <summary>
+    /// Pushes the input object to the log and returns it.
+    /// </summary>
+    /// <param name="_Msg">Object to log.</param>
+    /// <typeparam name="T">Type of _Msg</typeparam>
+    /// <returns>_Msg.</returns>
+    public T InfoReturn<T>(T _Msg)
+    {
+        Info(_Msg.ToString());
+        return _Msg;
     }
 }

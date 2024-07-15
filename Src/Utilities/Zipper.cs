@@ -76,6 +76,7 @@ public class Zipper
 
         foreach (var F in Files)
         {
+            Log.Info($"Adding {F} to archive.");
             TE = TarEntry.CreateEntryFromFile(F);
             TA.WriteEntry(TE, false);
         }

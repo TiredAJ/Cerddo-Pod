@@ -17,16 +17,24 @@ public abstract class LoggerBase
         { return _LogLocation; }
         set
         {
-            if (value.HasValue && !Directory.Exists(value.Value))
+            if (value.HasValue)
             {
-                try
+                if (!Directory.Exists(value.Value))
                 {
-                    Directory.CreateDirectory(value.Value);
-                    _LogLocation = value;
+                    try
+                    {
+                        Directory.CreateDirectory(value.Value);
+                        _LogLocation = value;
+                        return;
+                    }
+                    catch (Exception EXC)
+                    { _LogLocation = $"{DefaultLoc}{Path.DirectorySeparatorChar}CerddoPod-Log.md"; }
                 }
-                catch (Exception EXC)
-                { _LogLocation = $"{DefaultLoc}{Path.DirectorySeparatorChar}CerddoPod-Log.md"; }
+                
+                _LogLocation = value;
             }
+            else
+            { _LogLocation = $"{DefaultLoc}{Path.DirectorySeparatorChar}CerddoPod-Log.md"; }
         }
     }
     internal Maybe<string> _LogLocation = string.Empty;

@@ -1,10 +1,17 @@
 ﻿using System.Runtime.InteropServices;
+using Utilities.Logging;
 
 namespace Utilities.Platforms;
 
 public class Platformer
 {
     private static OSPlat _CurPlatform = OSPlat.Other;
+    private static Logger Log;
+
+    public Platformer()
+    {
+        Log = LoggerBuilder.Init().UseDefaultLoc().LogName("Utilities").Build();
+    }
     
     /// <summary>
     /// Gets the <see cref="OSPlat"/> of the current platform
@@ -13,7 +20,9 @@ public class Platformer
     public static OSPlat GetPlatform()
     {
         if (_CurPlatform != OSPlat.Other)
-        { return _CurPlatform; }
+        { Log.Info($"Using cached platform \"{_CurPlatform}\""); return _CurPlatform; }
+        
+        Log.Info("Trying to discern platform...");
         
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         { _CurPlatform = OSPlat.Linux; }
@@ -25,6 +34,8 @@ public class Platformer
         { _CurPlatform = OSPlat.FreeBSD; }
         else
         { _CurPlatform = OSPlat.Other; }
+        
+        Log.Info($"Platform assumed as {_CurPlatform}.");
         
         return _CurPlatform;
     }
@@ -57,14 +68,16 @@ public class Platformer
     /// <returns><see cref="OSArch"/></returns>
     public static OSArch GetArchitecture()
     {
+        Log.Info("Attempting to discern platform architecture.");
+        
         switch (RuntimeInformation.ProcessArchitecture)
         {
             case Architecture.X64:
-                return OSArch.X64;
+                return Log.InfoReturn(OSArch.X64);
             case Architecture.Arm64:
-                return OSArch.Arm64;
+                return Log.InfoReturn(OSArch.Arm64);
             default:
-                return OSArch.Other;
+                return Log.InfoReturn(OSArch.Other);
         }
     }
 
