@@ -8,7 +8,7 @@ using ReactiveUI.Fody.Helpers;
 using System;
 using System.Threading.Tasks;
 using Utilities.Logging;
-using static Utilities.Logging.LoggerBuilder;
+using Utilities.Logging;
 using Common.Appearance;
 using MixerStudio.Utils;
 using System.Diagnostics;
@@ -19,13 +19,13 @@ namespace MixerStudio.ViewModels;
 public class AppearanceViewModel : ViewModelBase
 {
     private Dictionary<string, ControlSpecs> IntControls = new();
-    private Logger Logger;
+    private Logger Log;
 
     [Reactive]
     public (Control, ControlSpecs) Current { get; set; }
     
     public AppearanceViewModel()
-    { Logger = Loggers["MixerStudio/Appearance"]; }
+    { Log = LoggerBuilder.Loggers["MixerStudio/Appearance"]; }
 
     public void Command_InitControls(Panel _Parent)
     { InitControls(_Parent); }
@@ -57,7 +57,7 @@ public class AppearanceViewModel : ViewModelBase
             if (C.Name is string Name)
             {
                 if (!IntControls.TryAdd(Name, new ControlSpecs()))
-                { Logger.Error($"Duplicate control name found: [{C.Name}]"); }
+                { Log.Error($"Duplicate control name found: [{C.Name}]"); }
                 else
                 {
                     if (C.GetType().GetProperty("Background") is ISolidColorBrush ISCB_bg)
@@ -70,7 +70,7 @@ public class AppearanceViewModel : ViewModelBase
                 }
             }
             else
-            { Logger.Error($"Control [{C.GetType().FullName}] doesn't have a name!"); }
+            { Log.Error($"Control [{C.GetType().FullName}] doesn't have a name!"); }
         }
     }
 

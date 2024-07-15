@@ -19,7 +19,7 @@ public abstract class LoggerBase
         {
             if (value.HasValue)
             {
-                if (!Directory.Exists(value.Value))
+                if (!Directory.Exists(Path.GetDirectoryName(value.Value)))
                 {
                     try
                     {
@@ -66,13 +66,13 @@ public abstract class LoggerBase
     private void SendLog_File(string _Msg)
     {
         //Checks that there's a log file to write to
-        if (LogLocation == string.Empty)
-        {
-            LogLocation = Path.Combine(
-                Environment.GetFolderPath
-                    (Environment.SpecialFolder.DesktopDirectory),
-                "CerddoPod-Log.txt");
-        }
+        // if (LogLocation == string.Empty)
+        // {
+        //     LogLocation = Path.Combine(
+        //         Environment.GetFolderPath
+        //             (Environment.SpecialFolder.DesktopDirectory),
+        //         "CerddoPod-Log.txt");
+        // }
 
         //enques the current message to the file queue
         FileTemp.Enqueue(_Msg);
@@ -161,8 +161,8 @@ public class LoggerBuilder
     private char Separator = Path.DirectorySeparatorChar;
     
     private static Maybe<LoggerBuilder> Instance = Maybe<LoggerBuilder>.None;
-    
-    public static Dictionary<string, Logger> Loggers { get; private set; }
+
+    public static Dictionary<string, Logger> Loggers { get; private set; } = new ();
 
     private LoggerBuilder()
     { _Logger = new Logger(); }
@@ -257,6 +257,12 @@ public class LoggerBuilder
     /// <returns>New Logger object to use.</returns>
     public Logger Build()
     { return _Logger; }
+
+    /// <summary>
+    /// Stores the logger in <see cref="Loggers"/> without returning the new logger.
+    /// </summary>
+    public void Store()
+    { Loggers.Add(_Logger.LogName, _Logger); }
 
     /// <summary>
     /// Copies settings from existing Logger.

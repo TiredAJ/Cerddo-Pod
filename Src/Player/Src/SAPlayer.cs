@@ -131,12 +131,13 @@ public class SAPlayer : PlayerBase, IDisposable
             string FlacPuginName = "";
             
             //Checks the platform to get the right name for the bass flac plugin
+            //helps if it's written correctly ffs.
             switch (Platformer.GetPlatform())
             {
                 case OSPlat.Windows:
-                { FlacPuginName = "libbassflac.so"; break; }
+                { FlacPuginName = "libbassflac.dll"; break; }
                 case OSPlat.Linux:
-                { FlacPuginName = "bassflac.dll"; break; }                    
+                { FlacPuginName = "bassflac.so"; break; }                    
                 case OSPlat.OSX:
                 { FlacPuginName = "libbassflac.dylib"; break; }
                 case OSPlat.Other:
@@ -377,6 +378,8 @@ public class SAPlayer : PlayerBase, IDisposable
             Tunes.Add(Temp);
         }
 
+        NowPlaying = Tunes[0];
+        
         return Log.InfoResult("Successfully loaded (some) songs.");
     }
     #endregion

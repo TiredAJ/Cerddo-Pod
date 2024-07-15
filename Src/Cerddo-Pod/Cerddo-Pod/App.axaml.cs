@@ -11,11 +11,28 @@ public partial class App : Application
 {
     public override void Initialize()
     {
+        Init()
+            .UseDefaultLoc()
+            .LogName("CerddoPod", "SAPlayer")
+            .Store();
+        Init()
+            .UseDefaultLoc()
+            .LogName("CerddoPod", "MPData")
+            .Store();
+        Init()
+            .UseDefaultLoc()
+            .LogName("CerddoPod", "UI")
+            .Store();
+        Init()
+            .UseDefaultLoc()
+            .LogName("CerddoPod", "Misc")
+            .Store();
+        
         AvaloniaXamlLoader.Load(this);
     }
 
     public override void OnFrameworkInitializationCompleted()
-    {
+    {        
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow
@@ -31,23 +48,6 @@ public partial class App : Application
             };
         }
         
-        _ = Init()
-            .UseDefaultLoc()
-            .LogName("CerddoPod", "SAPlayer")
-            .BuildAndStore();
-        _ = Init()
-            .UseDefaultLoc()
-            .LogName("CerddoPod", "MPData")
-            .BuildAndStore();
-        _ = Init()
-            .UseDefaultLoc()
-            .LogName("CerddoPod", "UI")
-            .BuildAndStore();
-        _ = Init()
-            .UseDefaultLoc()
-            .LogName("CerddoPod", "Misc")
-            .BuildAndStore();
-
         base.OnFrameworkInitializationCompleted();
     }
 }
