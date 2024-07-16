@@ -11,7 +11,7 @@ namespace Utilities.Logging;
 public sealed partial class Logger : LoggerBase
 {
     internal Logger()
-    {}
+    { }
     
     /// <summary>
     /// Pushes a warning to the log. User can ignore.

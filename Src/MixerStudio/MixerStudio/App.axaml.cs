@@ -13,18 +13,22 @@ public partial class App : Application
     public override void Initialize()
     {
         _ = Init()
+            .NewLogger()
             .UseDefaultLoc()
             .LogName("MixerStudio", "Appearance")
             .BuildAndStore();
         _ = Init()
+            .NewLogger()
             .UseDefaultLoc()
             .LogName("MixerStudio", "Music")
             .BuildAndStore();
         _ = Init()
+            .NewLogger()
             .UseDefaultLoc()
             .LogName("MixerStudio", "Export")
             .BuildAndStore();
         _ = Init()
+            .NewLogger()
             .UseDefaultLoc()
             .LogName("MixerStudio", "Misc")
             .BuildAndStore();

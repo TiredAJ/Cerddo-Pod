@@ -109,7 +109,7 @@ struct MPData
     
     public MPData()
     {
-        Log = Loggers["CerddoPod/MPData"];
+        Log = Loggers["CerddoPod/Backend"];
     }
 
     public static Result<MPData> LoadFromFile(string _F)

@@ -59,4 +59,7 @@ public class MainViewModel : ViewModelBase
 
     public void Closing()
     { SAP.Closing(); }
+
+    ~MainViewModel()
+    { LoggerBuilder.CloseLoggers(); }
 }

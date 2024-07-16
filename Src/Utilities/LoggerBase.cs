@@ -1,16 +1,23 @@
 ﻿using CSharpFunctionalExtensions;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Text;
+
 using Utilities.Platforms;
 
 namespace Utilities.Logging;
 
 public abstract class LoggerBase
 {
-    protected static ConcurrentQueue<string> FileTemp = new();
-    protected static ManualResetEventSlim WhileWriting = new (true);
-    protected static bool WriterRunning = false, Waiting = false;
+    #region Protected members
+    protected ConcurrentQueue<string> FileTemp = new();
+    //protected static ManualResetEventSlim WhileWriting = new (true);
+    //protected bool WriterRunning = false, Waiting = false;
     protected static string DefaultLoc = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+    #endregion
+
+    #region Internal Members
     internal Maybe<string> LogLocation
     {
         get
@@ -40,6 +47,8 @@ public abstract class LoggerBase
     internal Maybe<string> _LogLocation = string.Empty;
     internal Maybe<Action<string>> CustomStrLogger = Maybe<Action<string>>.None;
     internal string LogName = String.Empty;
+    internal bool WriterThreadRun = false;
+    #endregion
     
     /// <summary>
     /// Private, base function to push to all the logs
@@ -47,16 +56,16 @@ public abstract class LoggerBase
     /// <param name="_Msg">string message to push</param>
     protected void _PushLog(char _Severity, string _Msg)
     {
-        Task.Run(() =>
-        {
-            var MSG = $"[{_Severity}] - [{DateTime.Now:yyyy-MM-dd HH:mm:ss}] => {_Msg}";
+        var MSG = $"[{_Severity}] - [{DateTime.Now:yyyy-MM-dd HH:mm:ss}] => {_Msg}";
 
-            SendLog_Debug(MSG);
-            SendLog_File(MSG);
+        SendLog_Debug(MSG);
+        SendLog_File(MSG);
 
-            if (CustomStrLogger.HasValue)
-            { CustomStrLogger.Value(_Msg); }
-        });
+        if (CustomStrLogger.HasValue)
+        { CustomStrLogger.Value(_Msg); }
+        // Task.Run(() =>
+        // {
+        // });
     }
     
     [Conditional("DEBUG")]
@@ -65,54 +74,41 @@ public abstract class LoggerBase
 
     private void SendLog_File(string _Msg)
     {
-        //Checks that there's a log file to write to
-        // if (LogLocation == string.Empty)
-        // {
-        //     LogLocation = Path.Combine(
-        //         Environment.GetFolderPath
-        //             (Environment.SpecialFolder.DesktopDirectory),
-        //         "CerddoPod-Log.txt");
-        // }
-
         //enques the current message to the file queue
         FileTemp.Enqueue(_Msg);
 
-        //If there's already a thread waiting to execute, it'll return
-        //because the message has already been 
-        if (Waiting || WriterRunning)
-        { return; }
+        if (!WriterThreadRun)
+        { 
+            WriterThreadRun = true;
+            WriterThread();
+        }
+    }
 
-        Waiting = true;
-    
-        WhileWriting.Wait();
-        WhileWriting.Reset();
-
-        Waiting = false;
-
-        Task.Run(() =>
+    public async Task WriterThread()
+    {
+        await Task.Run(async() =>
         {
-            if (FileTemp.IsEmpty)
-            { return; }
-        
-            WriterRunning = true;
-        
-            string Temp;
+            string MSG = string.Empty;
 
-            using (StreamWriter Writer = new (LogLocation.Value, true))
+            using (StreamWriter Writer = new (LogLocation.Value))
             {
-                while (!FileTemp.IsEmpty)
+                while (WriterThreadRun)
                 {
-                    if (FileTemp.TryDequeue(out Temp))
-                    { Writer.WriteLine(Temp); }
+                    if (FileTemp.TryDequeue(out MSG))
+                    {
+                        //Debug.WriteLine(MSG);
+                        
+                        Writer.WriteLineAsync(MSG);
+                        
+                        Writer.Flush();
+                    }
                 }
-            
-                Writer.Close();
             }
-        
-            WhileWriting.Set();
-            WriterRunning = false;
         });
     }
+
+    public void CloseWriter()
+    { WriterThreadRun = false; }
 }
 
 /// <summary>
@@ -165,7 +161,16 @@ public class LoggerBuilder
     public static Dictionary<string, Logger> Loggers { get; private set; } = new ();
 
     private LoggerBuilder()
-    { _Logger = new Logger(); }
+    { }
+
+    public static void CloseLoggers()
+    {
+        foreach (var L in Loggers.Values)
+        {
+            L.Info("Closing Log...");
+            L.CloseWriter();
+        }
+    }
     
     /// <summary>
     /// Init
@@ -174,8 +179,18 @@ public class LoggerBuilder
     {
         if (Instance.HasNoValue)
         { Instance = new LoggerBuilder(); }
-
+        
         return Instance.Value;
+    }
+
+    /// <summary>
+    /// Creates a new <see cref="Logger"/> object.
+    /// </summary>
+    /// <returns></returns>
+    public LoggerBuilder NewLogger()
+    {
+        _Logger = new Logger();
+        return this;
     }
 
     /// <summary>
@@ -241,14 +256,28 @@ public class LoggerBuilder
         return this;
     }
 
+    private void _Build()
+    {
+        if (!Directory.Exists(Path.GetDirectoryName(_Logger.LogLocation.Value)))
+        { Directory.CreateDirectory(Path.GetDirectoryName(_Logger.LogLocation.Value)); }
+        
+        if (!File.Exists(_Logger.LogLocation.Value))
+        { File.Create(_Logger.LogLocation.Value).Close(); }
+
+        _Logger.WriterThreadRun = false;
+
+        //_Logger.Writer = new StreamWriter(_Logger.LogLocation.Value, Encoding.UTF8, new FileStreamOptions(){Mode = FileMode.Append, Access = FileAccess.Write, Options = FileOptions.None});
+    }
+
     /// <summary>
     /// Creates the logger object and adds it to <see cref="Loggers"/>.
     /// </summary>
     /// <returns>New Logger object to use.</returns>
     public Logger BuildAndStore()
     {
+        _Build();
         Loggers.Add(_Logger.LogName, _Logger);
-        return _Logger;        
+        return Loggers[_Logger.LogName];        
     }
 
     /// <summary>
@@ -256,13 +285,19 @@ public class LoggerBuilder
     /// </summary>
     /// <returns>New Logger object to use.</returns>
     public Logger Build()
-    { return _Logger; }
+    {
+        _Build();
+        return _Logger;
+    }
 
     /// <summary>
     /// Stores the logger in <see cref="Loggers"/> without returning the new logger.
     /// </summary>
     public void Store()
-    { Loggers.Add(_Logger.LogName, _Logger); }
+    {
+        _Build();
+        Loggers.Add(_Logger.LogName, _Logger);
+    }
 
     /// <summary>
     /// Copies settings from existing Logger.
@@ -273,7 +308,8 @@ public class LoggerBuilder
         _Logger = new Logger()
         {
             LogLocation = _L.LogLocation, 
-            CustomStrLogger = _L.CustomStrLogger
+            CustomStrLogger = _L.CustomStrLogger,
+            LogName = _L.LogName
         };
         return this;
     }

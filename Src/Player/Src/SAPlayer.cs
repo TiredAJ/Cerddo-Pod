@@ -93,7 +93,7 @@ public class SAPlayer : PlayerBase, IDisposable
     #region Init
     public SAPlayer()
     {
-        Log = Loggers["CerddoPod/SAPlayer"];
+        Log = Loggers["CerddoPod/Backend"];
         
         Log.Info("SAPlayer initialised");
         

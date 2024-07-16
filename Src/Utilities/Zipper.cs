@@ -10,7 +10,7 @@ public class Zipper
     private static Logger Log;
 
     public Zipper()
-    { Log = LoggerBuilder.Init().UseDefaultLoc().LogName("Zipper").Build(); }
+    { Log = LoggerBuilder.Init().NewLogger().UseDefaultLoc().LogName("Zipper").Build(); }
     
     /// <summary>
     /// Extracts the input file to the output directory

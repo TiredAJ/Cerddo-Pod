@@ -12,20 +12,14 @@ public partial class App : Application
     public override void Initialize()
     {
         Init()
+            .NewLogger()
             .UseDefaultLoc()
-            .LogName("CerddoPod", "SAPlayer")
+            .LogName("CerddoPod", "Backend")
             .Store();
         Init()
-            .UseDefaultLoc()
-            .LogName("CerddoPod", "MPData")
-            .Store();
-        Init()
+            .NewLogger()
             .UseDefaultLoc()
             .LogName("CerddoPod", "UI")
-            .Store();
-        Init()
-            .UseDefaultLoc()
-            .LogName("CerddoPod", "Misc")
             .Store();
         
         AvaloniaXamlLoader.Load(this);
