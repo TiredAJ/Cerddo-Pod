@@ -1,8 +1,4 @@
 ﻿using CSharpFunctionalExtensions;
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using Utilities.Platforms;
 
 namespace Utilities.Logging;
 
@@ -67,8 +63,12 @@ public sealed partial class Logger
     
     public Result<T> InfoResult<T>(T _Msg)
     {
-        Info(_Msg.ToString());
-        return Result.Success<T>(_Msg);
+        if (_Msg != null)
+        {
+            Info(_Msg.ToString()!);
+            return Result.Success<T>(_Msg);
+        }
+        return Result.Success<T>(default!);
     }
     
     /// <summary>

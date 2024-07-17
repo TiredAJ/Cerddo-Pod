@@ -1,8 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 using Utilities.Platforms;
 
@@ -11,7 +9,7 @@ namespace Utilities.Logging;
 public abstract class LoggerBase
 {
     #region Protected members
-    protected ConcurrentQueue<string> FileTemp = new();
+    protected ConcurrentQueue<string?> FileTemp = new();
     //protected static ManualResetEventSlim WhileWriting = new (true);
     //protected bool WriterRunning = false, Waiting = false;
     protected static string DefaultLoc = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
@@ -34,7 +32,7 @@ public abstract class LoggerBase
                         _LogLocation = value;
                         return;
                     }
-                    catch (Exception EXC)
+                    catch (Exception)
                     { _LogLocation = $"{DefaultLoc}{Path.DirectorySeparatorChar}CerddoPod-Log.md"; }
                 }
                 
@@ -49,10 +47,11 @@ public abstract class LoggerBase
     internal string LogName = String.Empty;
     internal bool WriterThreadRun = false;
     #endregion
-    
+
     /// <summary>
     /// Private, base function to push to all the logs
     /// </summary>
+    /// <param name="_Severity">Character to represent severity</param>
     /// <param name="_Msg">string message to push</param>
     protected void _PushLog(char _Severity, string _Msg)
     {
@@ -69,10 +68,10 @@ public abstract class LoggerBase
     }
     
     [Conditional("DEBUG")]
-    private void SendLog_Debug(string _Msg)
+    private void SendLog_Debug(string? _Msg)
     { Debug.WriteLine(_Msg); }
 
-    private void SendLog_File(string _Msg)
+    private void SendLog_File(string? _Msg)
     {
         //enques the current message to the file queue
         FileTemp.Enqueue(_Msg);
@@ -80,7 +79,7 @@ public abstract class LoggerBase
         if (!WriterThreadRun)
         { 
             WriterThreadRun = true;
-            WriterThread();
+            _ = WriterThread();
         }
     }
 
@@ -88,21 +87,16 @@ public abstract class LoggerBase
     {
         await Task.Run(async() =>
         {
-            string MSG = string.Empty;
+            await using StreamWriter Writer = new (LogLocation.Value);
 
-            using (StreamWriter Writer = new (LogLocation.Value))
+            while (WriterThreadRun)
             {
-                while (WriterThreadRun)
-                {
-                    if (FileTemp.TryDequeue(out MSG))
-                    {
-                        //Debug.WriteLine(MSG);
+                if (!FileTemp.TryDequeue(out string? MSG))
+                { continue; }
                         
-                        Writer.WriteLineAsync(MSG);
+                await Writer.WriteLineAsync(MSG);
                         
-                        Writer.Flush();
-                    }
-                }
+                await Writer.FlushAsync();
             }
         });
     }

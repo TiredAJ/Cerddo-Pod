@@ -12,11 +12,17 @@ public class PlayerBase : ReactiveObject
     /// <summary>
     /// File extensions
     /// </summary>
-    public const string METAFILEEXT = ".mpdata", VIEWFILEEXT = ".mpview";
+    protected const string METAFILEEXT = ".mpdata";
+
+    /// <summary>
+    /// File extensions
+    /// </summary>
+    public const string VIEWFILEEXT = ".mpview";
+
     /// <summary>
     /// Audio file types supported by the application
     /// </summary>
-    public static readonly string[] SUPPORTEDFILETYPES = [".wav", ".mp3", ".ogg", ".aiff", ".mp2", ".mp1", ".flac"];
+    protected static readonly string[] SUPPORTEDFILETYPES = [".wav", ".mp3", ".ogg", ".aiff", ".mp2", ".mp1", ".flac"];
     /// <summary>
     /// State of Bass' initialisation
     /// </summary>
@@ -72,7 +78,7 @@ public class PlayerBase : ReactiveObject
     /// <summary>
     /// Flag for whether the player has subscribed to <see cref="Syncer.EndOfSong"/>
     /// </summary>
-    protected bool EndSubsribed = false;
+    protected bool EndSubscribed = false;
     /// <summary>
     /// Used to control <see cref="SAPlayer.PositionRunner()">PositionRunner()</see>
     /// </summary>
@@ -87,14 +93,14 @@ public class Syncer
 {
     /// <summary> Primary event to subscribe to </summary>
     public static event EventHandler? EndOfSong;
-    private static SyncProcedure IntSyncer = new SyncProcedure(SyncProc);
+    private static readonly SyncProcedure INT_SYNCER = SyncProc;
 
     /// <summary>
     /// Sets the sync in Bass to the inputted song handle
     /// </summary>
     /// <param name="_Handle">Handle of song to subscribe to it's end</param>
     public static void InitSync(int _Handle)
-    { Bass.ChannelSetSync(_Handle, SyncFlags.End | SyncFlags.Mixtime, 0, IntSyncer); }
+    { Bass.ChannelSetSync(_Handle, SyncFlags.End | SyncFlags.Mixtime, 0, INT_SYNCER); }
 
     /// <summary>
     /// Called when the song has finished
@@ -141,7 +147,7 @@ public struct SongData
 
 /// <summary>
 /// This contains the effects that will be applied
-/// to the it's owning song.
+/// to it's owning song.
 /// </summary>
 public struct SongEffects
 {

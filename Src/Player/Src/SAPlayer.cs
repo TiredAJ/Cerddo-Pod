@@ -3,7 +3,6 @@ using CSharpFunctionalExtensions;
 using ManagedBass;
 using ManagedBass.Flac;
 using Player.Utils;
-using System.Diagnostics;
 using Utilities.Platforms;
 using Utilities.Zipping;
 using ReactiveUI;
@@ -66,10 +65,10 @@ public class SAPlayer : PlayerBase, IDisposable
     /// Holds the index of the currently played
     /// song from <see cref="PlayerBase.Tunes"/>
     /// </summary>
-    public int CurrentSong
+    private int CurrentSong
     {
         get => _CurrentSong;
-        private set
+        set
         {
             if (value >= Tunes.Count)
             { _CurrentSong = 0; }
@@ -113,7 +112,7 @@ public class SAPlayer : PlayerBase, IDisposable
     {
         if (IsInitialised)
         {
-            Log.Info("Reseting Bass");
+            Log.Info("Resetting Bass");
             
             //Frees all streams, not sure if necessary when calling Bass.Free()
             foreach (var SD in Tunes)
@@ -128,26 +127,26 @@ public class SAPlayer : PlayerBase, IDisposable
         
         if (!IsInitialised)
         {
-            string FlacPuginName = "";
+            string FlacPluginName = "";
             
             //Checks the platform to get the right name for the bass flac plugin
             //helps if it's written correctly ffs.
             switch (Platformer.GetPlatform())
             {
                 case OSPlat.Windows:
-                { FlacPuginName = "libbassflac.dll"; break; }
+                { FlacPluginName = "libbassflac.dll"; break; }
                 case OSPlat.Linux:
-                { FlacPuginName = "bassflac.so"; break; }                    
+                { FlacPluginName = "bassflac.so"; break; }                    
                 case OSPlat.OSX:
-                { FlacPuginName = "libbassflac.dylib"; break; }
+                { FlacPluginName = "libbassflac.dylib"; break; }
                 case OSPlat.Other:
                 { Log.FatalThrow($"Unknown platform! {Platformer.GetPlatformStr()}"); return; }
             }
 
-            if (BassHelpers.PluginLoad(out BassFlacHandle, FlacPuginName))
-            { Log.Error($"Plugin \"{FlacPuginName}\" could not be loaded! {Bass.LastError}"); }
+            if (BassHelpers.PluginLoad(out BassFlacHandle, FlacPluginName))
+            { Log.Error($"Plugin \"{FlacPluginName}\" could not be loaded! {Bass.LastError}"); }
             else
-            { Log.Info($"Plugin \"{FlacPuginName}\" Loaded."); }
+            { Log.Info($"Plugin \"{FlacPluginName}\" Loaded."); }
 
             IsInitialised = Bass.Init(-1, 48000, DeviceInitFlags.Stereo);          
 
@@ -210,7 +209,7 @@ public class SAPlayer : PlayerBase, IDisposable
     /// <param name="_Location">The path to the folder</param>
     /// <returns>
     /// A <see cref="Result"/> determining the outcome of the
-    /// operation and it's nested operations. 
+    /// operation, and it's nested operations. 
     /// </returns>
     private Result _LoadMix(string _Location)
     {
@@ -218,10 +217,8 @@ public class SAPlayer : PlayerBase, IDisposable
         if (DisposedValue)
         { return Log.ErrorResult(DefMsg.PlayerDisposed); }
 
-        Result R;
-
         //Checks if folder exists
-        R = FolderChecker(_Location);
+        Result R = FolderChecker(_Location);
 
         if (R.IsFailure)
         { return R; }
@@ -254,17 +251,15 @@ public class SAPlayer : PlayerBase, IDisposable
     {
         //https://learn.microsoft.com/en-us/dotnet/core/extensions/file-globbing#get-all-matching-files
         var Files = Directory.GetFiles(_Loc);
-        //TODO: change to List or IEnummerable?
+        //TODO: change to List or IEnumerable?
         Queue<string> _Songs = new();
         bool Errors = false;
 
         Log.Info($"Found {Files.Length} files in mix directory.");
 
-        string Ext, ErMsg = string.Empty;
-
         foreach (var F in Files)
         {
-            Ext = Path.GetExtension(F);
+            string Ext = Path.GetExtension(F);
 
             switch (Ext.ToLower())
             {
@@ -323,13 +318,11 @@ public class SAPlayer : PlayerBase, IDisposable
         if (!IsInitialised)
         { return Log.ErrorResult(DefMsg.BassNoInit); }
 
-        SongData Temp;
-
         while (_Songs.Count > 0)
         {
             string Song = _Songs.Dequeue();
 
-            Temp = new();
+            SongData Temp = new();
             
             Log.Info($"Trying to load \"{Song}\".");
             
@@ -362,15 +355,15 @@ public class SAPlayer : PlayerBase, IDisposable
             {
                 Log.Info($"Trying to load song info for \"{Song}\".");
                 
-                Track TSong = new(Song);
+                Track SongTrackInfo = new(Song);
 
-                if (TSong.EmbeddedPictures.Count > 0)
-                { Temp.CoverImg = Maybe.From(TSong.EmbeddedPictures.First().PictureData.ToList()); }
+                if (SongTrackInfo.EmbeddedPictures.Count > 0)
+                { Temp.CoverImg = Maybe.From(SongTrackInfo.EmbeddedPictures.First().PictureData.ToList()); }
                 else
                 { Log.Warning($"No embedded pictures found for {Song}."); }
 
-                Temp.ArtistName = TSong.Artist;
-                Temp.SongName = TSong.Title is not null ? TSong.Title : Path.GetFileNameWithoutExtension(Song);
+                Temp.ArtistName = SongTrackInfo.Artist;
+                Temp.SongName = SongTrackInfo.Title ?? Path.GetFileNameWithoutExtension(Song);
             }
             catch (Exception EXC)
             { return Log.ErrorResult(EXC.Message); }
@@ -406,7 +399,7 @@ public class SAPlayer : PlayerBase, IDisposable
         }
     }
 
-    public void Play()
+    private void Play()
     {
         if (!CheckPlay())
         { return; }
@@ -418,33 +411,33 @@ public class SAPlayer : PlayerBase, IDisposable
         
         Syncer.InitSync(Tunes[CurrentSong].SoundHandle);
         
-        if (!EndSubsribed)
+        if (!EndSubscribed)
         {
             Syncer.EndOfSong += SyncerOnEndOfSong;
             Log.Info("Subscribed to song end.");
-            EndSubsribed = true;
+            EndSubscribed = true;
         }
         
-        //Debug.WriteLine($"[Play] EndSubsribed: {EndSubsribed}");
+        //Debug.WriteLine($"[Play] EndSubscribed: {EndSubscribed}");
         
         PosRun = true;
         PosRunPause.Set();
-        PositionRunner();
+        _ = PositionRunner();
     }
 
     private void SyncerOnEndOfSong(object? _Sender, EventArgs _E)
     {        
-        if (EndSubsribed)
+        if (EndSubscribed)
         {
             Syncer.EndOfSong -= SyncerOnEndOfSong;
-            Log.Info("Unsubsribed from end of song.");
-            EndSubsribed = false;
+            Log.Info("Unsubscribed from end of song.");
+            EndSubscribed = false;
         }
         
         Skip();
     }
 
-    public void Pause()
+    private void Pause()
     {
         if (!CheckPlay())
         { return; }
@@ -453,16 +446,16 @@ public class SAPlayer : PlayerBase, IDisposable
         PosRunPause.Reset();
     }
 
-    public void Resume()
+    private void Resume()
     {
         if (!CheckPlay())
         { return; }
 
-        Bass.ChannelPlay(Tunes[CurrentSong].SoundHandle, false);
+        Bass.ChannelPlay(Tunes[CurrentSong].SoundHandle);
         PosRunPause.Set();
     }
 
-    public void Stop()
+    private void Stop()
     {
         if (!CheckPlay())
         { return; }
@@ -496,11 +489,11 @@ public class SAPlayer : PlayerBase, IDisposable
         { Bass.ChannelSetPosition(Tunes[CurrentSong].SoundHandle, 0); }
     }
 
-    public void SetPosition(double _Position)
+    private void SetPosition(double _NewPosition)
     {
-        var BytePos = Bass.ChannelSeconds2Bytes(NowPlaying.SoundHandle, _Position);
+        var BytePos = Bass.ChannelSeconds2Bytes(NowPlaying.SoundHandle, _NewPosition);
 
-        Bass.ChannelSetPosition(NowPlaying.SoundHandle, BytePos, PositionFlags.Bytes);
+        Bass.ChannelSetPosition(NowPlaying.SoundHandle, BytePos);
     }
     #endregion
 

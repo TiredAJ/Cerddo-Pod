@@ -8,6 +8,6 @@ public class BassHelpers
     {
         _Handle = Bass.PluginLoad(_PluginName);
         
-        return _Handle == 0 ? false : true;
+        return _Handle != 0;
     }
 }
