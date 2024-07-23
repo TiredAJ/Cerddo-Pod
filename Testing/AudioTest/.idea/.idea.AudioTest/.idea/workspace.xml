@@ -9,12 +9,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="46b599a2-9c88-450f-b3db-9f65c4995c85" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.AudioTest/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.AudioTest/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Cerddo_Pod.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Cerddo_Pod.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Utils/Converters.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Utils/Converters.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/ViewModels/MainViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/ViewModels/MainViewModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Views/MainView.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/../../UI-Static/Cerddo-Pod/Views/MainView.axaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../UI-Static/Player/SAPlayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../UI-Static/Player/SAPlayer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AudioTest.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/AudioTest.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,6 +95,7 @@
       <workItem from="1715581834922" duration="688000" />
       <workItem from="1715713142597" duration="1519000" />
       <workItem from="1715719441257" duration="166000" />
+      <workItem from="1721726258937" duration="24000" />
     </task>
     <servers />
   </component>
