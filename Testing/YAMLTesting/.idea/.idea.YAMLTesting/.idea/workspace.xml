@@ -24,6 +24,9 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="DpaMonitoringSettings">
+    <option name="autoShow" value="false" />
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
@@ -45,6 +48,16 @@
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
+}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/eac5daeaa01a4847a8267fc194281269c2d000/81/f2e46f3b/StringWriter.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/30adf657e1e05df2296d456f8bb0bc66db129e636c5d203c63eb404cc2d12cfb/Emitter.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/aa939405f93119bb94b131f572936dac77a509466298fad92cb51151769ce1/NodeValueDeserializer.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/b57179ab1239d6f2886ad4ac28e5789cc985fab099edd696e6f05dda2870fc/Serializer.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="2jh1PFWyHGgUf7MIpl2Za0i6NOR" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -53,10 +66,15 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    ".NET Project.YAMLTesting.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "main",
     "last_opened_file_path": "C:/Dev/Cerddo-Pod/Testing/YAMLTesting/YAMLTesting.sln",
     "settings.editor.selected.configurable": "preferences.pluginManager"
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/home/tiredaj/Repos",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings"
   }
 }]]></component>
   <component name="RunManager">
@@ -90,11 +108,40 @@
       <workItem from="1715358263553" duration="302000" />
       <workItem from="1721824471077" duration="1582000" />
       <workItem from="1722698141827" duration="5000" />
+      <workItem from="1722428458222" duration="2288000" />
     </task>
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="LOCAL_CHANGES_DETAILS_PREVIEW_SHOWN" value="false" />
+    <option name="LOCAL_CHANGES_DETAILS_PREVIEW_SHOWN" value="false" />
+    <ignored-roots>
+      <path value="$PROJECT_DIR$" />
+    </ignored-roots>
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Program.cs</url>
+          <line>54</line>
+          <properties documentPath="$PROJECT_DIR$/Program.cs" containingFunctionPresentation="Method 'Main'">
+            <startOffsets>
+              <option value="2122" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2152" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="Type#System.ValueTuple`2" memberName="Item2" />
+      </pinned-members>
+    </pin-to-top-manager>
   </component>
 </project>
