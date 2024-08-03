@@ -5,7 +5,7 @@ namespace Utilities.Platforms;
 
 public class Platformer
 {
-    private static OSPlat _CurPlatform = OSPlat.Other;
+    private static OSPlat _CurPlatform = OSPlat.OTHER;
     
     /// <summary>
     /// Gets the <see cref="OSPlat"/> of the current platform
@@ -14,15 +14,15 @@ public class Platformer
     public static OSPlat GetPlatform()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        { _CurPlatform = OSPlat.Linux; }
+        { _CurPlatform = OSPlat.LINUX; }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        { _CurPlatform = OSPlat.Windows; }
+        { _CurPlatform = OSPlat.WINDOWS; }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         { _CurPlatform = OSPlat.OSX; }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
-        { _CurPlatform = OSPlat.FreeBSD; }
+        { _CurPlatform = OSPlat.FREEBSD; }
         else
-        { _CurPlatform = OSPlat.Other; }
+        { _CurPlatform = OSPlat.OTHER; }
         
         return _CurPlatform;
     }
@@ -36,13 +36,13 @@ public class Platformer
     {
         switch (GetPlatform())
         {
-            case OSPlat.Linux:
+            case OSPlat.LINUX:
             { return "Linux"; }
-            case OSPlat.Windows:
+            case OSPlat.WINDOWS:
             { return "Windows"; }
             case OSPlat.OSX:
             { return "OSX"; }
-            case OSPlat.FreeBSD:
+            case OSPlat.FREEBSD:
             { return "FreeBSD"; }
             default:
             { return RuntimeInformation.OSDescription; }
@@ -55,28 +55,25 @@ public class Platformer
     /// <returns><see cref="OSArch"/></returns>
     public static OSArch GetArchitecture()
     {
-        switch (RuntimeInformation.ProcessArchitecture)
+        return RuntimeInformation.ProcessArchitecture switch
         {
-            case Architecture.X64:
-                return OSArch.X64;
-            case Architecture.Arm64:
-                return OSArch.Arm64;
-            default:
-                return OSArch.Other;
-        }
+            Architecture.X64 => OSArch.X64,
+            Architecture.Arm64 => OSArch.ARM64,
+            _ => OSArch.OTHER
+        };
     }
 
     public static string GetOSLogLocation()
     {
         switch (GetPlatform())
         {
-            case OSPlat.Linux:
+            case OSPlat.LINUX:
             case OSPlat.OSX:
-            case OSPlat.FreeBSD:
+            case OSPlat.FREEBSD:
                 return "/var/log";
-            case OSPlat.Windows:
+            case OSPlat.WINDOWS:
                 return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            case OSPlat.Other:
+            case OSPlat.OTHER:
             default:
                 return Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         }
@@ -85,16 +82,16 @@ public class Platformer
 
 public enum OSPlat
 {
-    Windows,
-    Linux,
+    WINDOWS,
+    LINUX,
     OSX,
-    FreeBSD,
-    Other
+    FREEBSD,
+    OTHER
 }
 
 public enum OSArch
 {
-    Arm64,
+    ARM64,
     X64,
-    Other
+    OTHER
 }

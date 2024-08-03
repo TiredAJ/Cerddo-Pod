@@ -2,7 +2,7 @@
 
 namespace Player.Utils;
 
-public class BassHelpers
+public static class BassHelpers
 {
     public static bool PluginLoad(out int _Handle, string _PluginName)
     {

@@ -1,31 +1,22 @@
 ﻿using CSharpFunctionalExtensions;
-using Newtonsoft.Json.Serialization;
-using NUnit.Framework.Constraints;
-using System.Data;
 using System.Globalization;
-using System.Numerics;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Common.Appearance;
 
-public struct AppearanceCollection
-{
-}
+public struct AppearanceCollection;
 
-public struct ControlSpecs
+public struct ControlSpecs(Colour _Default)
 {
     public Maybe<string> Font;
     public Maybe<float> FontSize;
     public Maybe<Colour> Foreground;
     public Maybe<Colour> Background;
-    public Colour Default;
+    public Colour Default = _Default;
 
     //Forces each control to have a default colour
-    public ControlSpecs(Colour _Default)
-    { Default = _Default; }
 }
 
-public struct Colour
+public struct Colour : IEquatable<Colour>
 {
     #region Properties    
     /// <summary>
@@ -98,7 +89,7 @@ public struct Colour
         if (HexStr.Length is not (6 or 8))
         { return Result.Failure("Hex input must be 6 or 8 characters."); }
 
-        List<byte> Vals = new();
+        List<byte> Vals = [];
 
         try
         {
@@ -133,13 +124,10 @@ public struct Colour
 
     public static Result<Colour> MakeFromHex(string _HexARGB)
     {
-        var C = new Colour();
-        var R = C.FromHex(_HexARGB);
+        Colour C = new Colour();
+        Result R = C.FromHex(_HexARGB);
 
-        if (R.IsFailure)
-        { return Result.Failure<Colour>(R.Error); }
-        else
-        { return Result.Success<Colour>(C); }
+        return R.IsFailure ? Result.Failure<Colour>(R.Error) : Result.Success(C);
     }
 
     public string ToHex()
@@ -151,25 +139,12 @@ public struct Colour
 
     #region Overrides    
     public override bool Equals(object? _O2)
-    {
-        if (_O2 is Colour C)
-        {
-            if (A != C.A)
-            { return false; }
+    { return _O2 is Colour C && (A == C.A) && (R == C.R) && (G == C.G) && (B == C.B); }
 
-            if (R != C.R)
-            { return false; }
+    public bool Equals(Colour _O2)
+    { return R == _O2.R && G == _O2.G && B == _O2.B && A == _O2.A; }
 
-            if (G != C.G)
-            { return false; }
-
-            if (B != C.B)
-            { return false;}
-
-            return true;
-        }
-        else
-        { return false; }
-    }
+    public override int GetHashCode()
+    { return HashCode.Combine(R, G, B, A); }
     #endregion
 }

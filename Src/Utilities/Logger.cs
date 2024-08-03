@@ -1,4 +1,6 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Diagnostics.CodeAnalysis;
+
+using CSharpFunctionalExtensions;
 
 namespace Utilities.Logging;
 
@@ -63,12 +65,11 @@ public sealed partial class Logger
     
     public Result<T> InfoResult<T>(T _Msg)
     {
-        if (_Msg != null)
-        {
-            Info(_Msg.ToString()!);
-            return Result.Success<T>(_Msg);
-        }
-        return Result.Success<T>(default!);
+        if (_Msg == null)
+        { return Result.Success<T>(default!); }
+        
+        Info(_Msg.ToString()!);
+        return Result.Success<T>(_Msg);
     }
     
     /// <summary>
@@ -156,7 +157,7 @@ public sealed partial class Logger
     public Exception FatalThrow(string _Msg)
     {
         Fatal(_Msg);
-        return new Exception(_Msg);
+        return new(_Msg);
     }
     
     /// <summary>
@@ -184,9 +185,12 @@ public sealed partial class Logger
     /// <param name="_Msg">Object to log.</param>
     /// <typeparam name="T">Type of _Msg</typeparam>
     /// <returns>_Msg.</returns>
-    public T InfoReturn<T>(T _Msg)
+    public T InfoReturn<T>([DisallowNull] T _Msg)
     {
-        Info(_Msg.ToString());
+        if (_Msg == null)
+        { throw new ArgumentNullException(nameof(_Msg)); }
+
+        Info(_Msg.ToString()!);
         return _Msg;
     }
 }

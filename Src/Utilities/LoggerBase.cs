@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 
 using Utilities.Platforms;
+// ReSharper disable All
 
 namespace Utilities.Logging;
 
@@ -55,7 +56,7 @@ public abstract class LoggerBase
     /// <param name="_Msg">string message to push</param>
     protected void _PushLog(char _Severity, string _Msg)
     {
-        var MSG = $"[{_Severity}] - [{DateTime.Now:yyyy-MM-dd HH:mm:ss}] => {_Msg}";
+        string MSG = $"[{_Severity}] - [{DateTime.Now:yyyy-MM-dd HH:mm:ss}] => {_Msg}";
 
         SendLog_Debug(MSG);
         SendLog_File(MSG);
@@ -68,7 +69,7 @@ public abstract class LoggerBase
     }
     
     [Conditional("DEBUG")]
-    private void SendLog_Debug(string? _Msg)
+    private static void SendLog_Debug(string? _Msg)
     { Debug.WriteLine(_Msg); }
 
     private void SendLog_File(string? _Msg)
@@ -76,14 +77,14 @@ public abstract class LoggerBase
         //enques the current message to the file queue
         FileTemp.Enqueue(_Msg);
 
-        if (!WriterThreadRun)
-        { 
-            WriterThreadRun = true;
-            _ = WriterThread();
-        }
+        if (WriterThreadRun)
+        { return; }
+        
+        WriterThreadRun = true;
+        _ = WriterThread();
     }
 
-    public async Task WriterThread()
+    private async Task WriterThread()
     {
         await Task.Run(async() =>
         {
@@ -113,15 +114,15 @@ public enum DefMsg
     /// <summary>
     /// When Player is disposed
     /// </summary>
-    PlayerDisposed,
+    PLAYER_DISPOSED,
     /// <summary>
     /// When Tune contains less than 1 song
     /// </summary>
-    TuneCount,
+    TUNE_COUNT,
     /// <summary>
     /// When Bass isn't/hasn't been initialised
     /// </summary>
-    BassNoInit,
+    BASS_NO_INIT
 }
 
 static class Extensions
@@ -131,24 +132,20 @@ static class Extensions
 
     internal static string StrDisplay(this DefMsg _Msg)
     {
-        switch (_Msg)
+        return _Msg switch
         {
-            case DefMsg.PlayerDisposed:
-            { return "Player object has been disposed! Please re-initialise."; }
-            case DefMsg.TuneCount:
-            { return "Tunes contains no songs to play."; }
-            case DefMsg.BassNoInit:
-            { return "Bass is not initialised."; }
-            default:
-            { return "Unknown Default Message."; }
-        }
+            DefMsg.PLAYER_DISPOSED => "Player object has been disposed! Please re-initialise.",
+            DefMsg.TUNE_COUNT => "Tunes contains no songs to play.",
+            DefMsg.BASS_NO_INIT => "Bass is not initialised.",
+            _ => "Unknown Default Message."
+        };
     }
 }
 
 public class LoggerBuilder
 {
-    private Logger _Logger;
-    private char Separator = Path.DirectorySeparatorChar;
+    private Logger _Logger = null!;
+    private readonly char Separator = Path.DirectorySeparatorChar;
     
     private static Maybe<LoggerBuilder> Instance = Maybe<LoggerBuilder>.None;
 
@@ -159,7 +156,7 @@ public class LoggerBuilder
 
     public static void CloseLoggers()
     {
-        foreach (var L in Loggers.Values)
+        foreach (Logger L in Loggers.Values)
         {
             L.Info("Closing Log...");
             L.CloseWriter();
@@ -198,7 +195,7 @@ public class LoggerBuilder
     }
 
     /// <summary>
-    /// Uses the default OS logging directory. Suggested to be used with <see cref="LogName"/>
+    /// Uses the default OS logging directory. Suggested to be used with <see cref="LogName()"/>
     /// </summary>
     /// <returns></returns>
     public LoggerBuilder UseDefaultLoc()
@@ -220,9 +217,9 @@ public class LoggerBuilder
     public LoggerBuilder LogName(string _ProjectName, string _ComponentName)
     {
         if (_Logger.LogLocation.HasNoValue)
-        { this.UseDefaultLoc(); }
+        { UseDefaultLoc(); }
         
-        _Logger.LogLocation += $"{Separator}{_ProjectName}{Separator}{_ComponentName}-Log.md";
+        _Logger.LogLocation = Maybe.From($"{_Logger.LogLocation.Value}{Separator}{_ProjectName}{Separator}{_ComponentName}-Log.md");
         
         _Logger.LogName = $"{_ProjectName}/{_ComponentName}";
         
@@ -235,7 +232,6 @@ public class LoggerBuilder
     /// MUST be used after either <see cref="UseDefaultLoc"/> or <see cref="SetLogLocation"/>, otherwise <see cref="UseDefaultLoc"/>
     /// will be used. This will also be the name of the logger in <see cref="Loggers"/> (e.g. "CerddoPod/Utils/Zipper".
     /// </summary>
-    /// <param name="_ProjectName">Name of project <see cref="_ComponentName"/> belongs to.</param>
     /// <param name="_ComponentName">Name of component to log.</param>
     /// <returns></returns>
     public LoggerBuilder LogName(string _ComponentName)
@@ -243,7 +239,7 @@ public class LoggerBuilder
         if (_Logger.LogLocation.HasNoValue)
         { this.UseDefaultLoc(); }
         
-        _Logger.LogLocation += $"{Separator}CerddoPod{Separator}Utils{Separator}{_ComponentName}-Log.md";
+        _Logger.LogLocation = Maybe.From($"{_Logger.LogLocation.Value}{Separator}CerddoPod{Separator}Utils{Separator}{_ComponentName}-Log.md");
         
         _Logger.LogName = $"Utils/{_ComponentName}";
         
@@ -252,12 +248,14 @@ public class LoggerBuilder
 
     private void _Build()
     {
-        if (!Directory.Exists(Path.GetDirectoryName(_Logger.LogLocation.Value)))
-        { Directory.CreateDirectory(Path.GetDirectoryName(_Logger.LogLocation.Value)); }
-        
-        if (!File.Exists(_Logger.LogLocation.Value))
-        { File.Create(_Logger.LogLocation.Value).Close(); }
-
+        if (_Logger.LogLocation.HasValue && _Logger.LogLocation.Value != String.Empty)
+        {
+            if (!Directory.Exists(Path.GetDirectoryName(_Logger.LogLocation.Value)))
+            { Directory.CreateDirectory(Path.GetDirectoryName(_Logger.LogLocation.Value)!); }
+            
+            if (!File.Exists(_Logger.LogLocation.Value))
+            { File.Create(_Logger.LogLocation.Value).Close(); }
+        }
         _Logger.WriterThreadRun = false;
 
         //_Logger.Writer = new StreamWriter(_Logger.LogLocation.Value, Encoding.UTF8, new FileStreamOptions(){Mode = FileMode.Append, Access = FileAccess.Write, Options = FileOptions.None});

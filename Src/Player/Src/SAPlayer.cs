@@ -1,13 +1,19 @@
 ﻿using ATL;
+
 using CSharpFunctionalExtensions;
+
 using ManagedBass;
 using ManagedBass.Flac;
+
 using Player.Utils;
+
+using ReactiveUI;
+
+using Utilities.Logging;
 using Utilities.Platforms;
 using Utilities.Zipping;
-using ReactiveUI;
+
 using static Utilities.Logging.LoggerBuilder;
-using Utilities.Logging;
 
 namespace Player;
 
@@ -34,13 +40,7 @@ public class SAPlayer : PlayerBase, IDisposable
     /// </summary>
     public SongData NowPlaying
     {
-        get
-        {
-            if (Tunes.Count == 0)
-            { return SongData.Default; }
-            else
-            { return Tunes[CurrentSong]; }
-        }
+        get => Tunes.Count == 0 ? SongData.Default : Tunes[CurrentSong];
         private set => this.RaiseAndSetIfChanged(ref _NowPlaying, value);
     }
     /// <summary>
@@ -115,7 +115,7 @@ public class SAPlayer : PlayerBase, IDisposable
             Log.Info("Resetting Bass");
             
             //Frees all streams, not sure if necessary when calling Bass.Free()
-            foreach (var SD in Tunes)
+            foreach (SongData SD in Tunes)
             { Bass.StreamFree(SD.SoundHandle); }
             
             Bass.Free();
@@ -133,13 +133,15 @@ public class SAPlayer : PlayerBase, IDisposable
             //helps if it's written correctly ffs.
             switch (Platformer.GetPlatform())
             {
-                case OSPlat.Windows:
+                case OSPlat.WINDOWS:
                 { FlacPluginName = "libbassflac.dll"; break; }
-                case OSPlat.Linux:
+                case OSPlat.LINUX:
                 { FlacPluginName = "bassflac.so"; break; }                    
                 case OSPlat.OSX:
                 { FlacPluginName = "libbassflac.dylib"; break; }
-                case OSPlat.Other:
+                case OSPlat.FREEBSD:
+                case OSPlat.OTHER:
+                default:
                 { Log.FatalThrow($"Unknown platform! {Platformer.GetPlatformStr()}"); return; }
             }
 
@@ -152,8 +154,8 @@ public class SAPlayer : PlayerBase, IDisposable
 
             if (!IsInitialised)
             { throw Log.FatalThrow<BassException>($"Bass couldn't initialise! {Bass.LastError}"); }
-            else
-            { Log.Info("Bass successfully Initialised."); }
+            
+            Log.Info("Bass successfully Initialised.");
 
             DisposedValue = false;
         }
@@ -183,13 +185,12 @@ public class SAPlayer : PlayerBase, IDisposable
         
         if (!Directory.Exists(Loc))
         { return Log.ErrorResult("Location doesn't seem to be a directory either!"); }
-        else
-        { Log.Info("Appears to be a directory."); }
+        Log.Info("Appears to be a directory.");
 
         return _LoadMix(Loc);
     }
 
-    private Result<string> ExtractFiles(string _Location)
+    private static Result<string> ExtractFiles(string _Location)
     {
         Log.Info("Extracting files...");
         
@@ -215,7 +216,7 @@ public class SAPlayer : PlayerBase, IDisposable
     {
         //Checks if the object has been disposed, just in case
         if (DisposedValue)
-        { return Log.ErrorResult(DefMsg.PlayerDisposed); }
+        { return Log.ErrorResult(DefMsg.PLAYER_DISPOSED); }
 
         //Checks if folder exists
         Result R = FolderChecker(_Location);
@@ -234,30 +235,30 @@ public class SAPlayer : PlayerBase, IDisposable
     private static Result FolderChecker(string _Loc)
     {
         //https://learn.microsoft.com/en-us/dotnet/core/extensions/file-globbing#get-all-matching-files
-        if (!Directory.Exists(_Loc))
-        { return Log.ErrorResult($"Folder \"{_Loc}\" does not exist!"); }
-        else
+        if (Directory.Exists(_Loc))
         { Log.Info("Directory exists!"); }
-        
-        if (!Directory.GetFiles(_Loc).Any(X => X.EndsWith(METAFILEEXT)))
-        { Log.Warning($"No {METAFILEEXT} datafile was present!"); }
         else
+        { return Log.ErrorResult($"Folder \"{_Loc}\" does not exist!"); }
+
+        if (Directory.GetFiles(_Loc).Any(X => X.EndsWith(METAFILEEXT)))
         { Log.Info($"{METAFILEEXT} file was found!"); }
-        
-        return Log.InfoResult($"Directory ready for use.");
+        else
+        { Log.Warning($"No {METAFILEEXT} datafile was present!"); }
+
+        return Log.InfoResult("Directory ready for use.");
     }
 
     private Result _LoadFiles(string _Loc)
     {
         //https://learn.microsoft.com/en-us/dotnet/core/extensions/file-globbing#get-all-matching-files
-        var Files = Directory.GetFiles(_Loc);
+        string[] Files = Directory.GetFiles(_Loc);
         //TODO: change to List or IEnumerable?
-        Queue<string> _Songs = new();
+        Queue<string> Songs = new();
         bool Errors = false;
 
         Log.Info($"Found {Files.Length} files in mix directory.");
 
-        foreach (var F in Files)
+        foreach (string F in Files)
         {
             string Ext = Path.GetExtension(F);
 
@@ -282,7 +283,7 @@ public class SAPlayer : PlayerBase, IDisposable
                 {
                     if (SUPPORTEDFILETYPES.Contains(Ext))
                     {
-                        _Songs.Enqueue(F);
+                        Songs.Enqueue(F);
                         Log.Info($"Song \"{Path.GetFileName(F)}\" loaded.");
                     }
                     else
@@ -292,17 +293,17 @@ public class SAPlayer : PlayerBase, IDisposable
             }
         }
         
-        Log.Info($"Of {Files.Length} file(s), {_Songs.Count} song(s) loaded.");
+        Log.Info($"Of {Files.Length} file(s), {Songs.Count} song(s) loaded.");
 
-        if (_Songs.Count > 0)
+        if (Songs.Count > 0)
         {
-            Result R = LoadSongs(_Songs);
+            Result R = LoadSongs(Songs);
 
-            if (R.IsFailure)
-            {
-                Log.Error($"\t{R.Error}");
-                Errors = true;
-            }
+            if (!R.IsFailure)
+            { return Errors ? Log.ErrorResult("Songs failed to load due to above errors.") : Result.Success(); }
+            
+            Log.Error($"\t{R.Error}");
+            Errors = true;
         }
         else
         {
@@ -316,7 +317,7 @@ public class SAPlayer : PlayerBase, IDisposable
     private Result LoadSongs(Queue<string> _Songs)
     {
         if (!IsInitialised)
-        { return Log.ErrorResult(DefMsg.BassNoInit); }
+        { return Log.ErrorResult(DefMsg.BASS_NO_INIT); }
 
         while (_Songs.Count > 0)
         {
@@ -328,13 +329,11 @@ public class SAPlayer : PlayerBase, IDisposable
             
             try
             {
-                switch (Path.GetExtension(Song).ToLower())
+                Temp.SoundHandle = Path.GetExtension(Song).ToLower() switch
                 {
-                    case ".flac":
-                    { Temp.SoundHandle = BassFlac.CreateStream(Song); break; }
-                    default:
-                    { Temp.SoundHandle = Bass.CreateStream(Song); break; }
-                }
+                    ".flac" => BassFlac.CreateStream(Song),
+                    _ => Bass.CreateStream(Song)
+                };
 
                 if (Temp.SoundHandle == 0)
                 {
@@ -479,7 +478,8 @@ public class SAPlayer : PlayerBase, IDisposable
     {
         if (!CheckPlay())
         { return; }
-        else if (Elapsed(Tunes[CurrentSong].SoundHandle) < 25)
+
+        if (Elapsed(Tunes[CurrentSong].SoundHandle) < 25)
         {
             Stop();
             CurrentSong--;
@@ -491,7 +491,7 @@ public class SAPlayer : PlayerBase, IDisposable
 
     private void SetPosition(double _NewPosition)
     {
-        var BytePos = Bass.ChannelSeconds2Bytes(NowPlaying.SoundHandle, _NewPosition);
+        long BytePos = Bass.ChannelSeconds2Bytes(NowPlaying.SoundHandle, _NewPosition);
 
         Bass.ChannelSetPosition(NowPlaying.SoundHandle, BytePos);
     }
@@ -504,11 +504,15 @@ public class SAPlayer : PlayerBase, IDisposable
     private bool CheckPlay()
     {
         if (DisposedValue)
-        { Log.Error(DefMsg.PlayerDisposed); return false; }
-        else if (Tunes.Count == 0)
-        { Log.Error(DefMsg.TuneCount); return false; }
-        else
-        { return true; }
+        { Log.Error(DefMsg.PLAYER_DISPOSED); return false; }
+
+        switch (Tunes.Count)
+        {
+            case 0:
+                Log.Error(DefMsg.TUNE_COUNT); return false;
+            default:
+                return true; 
+        }
     }
 
     private async Task PositionRunner()
@@ -530,20 +534,20 @@ public class SAPlayer : PlayerBase, IDisposable
     protected virtual void Dispose(bool _Disposing)
     {
         Log.Warning("Disposing of SAPlayer!");
-        
-        if (!DisposedValue)
+
+        if (DisposedValue)
+        { return; }
+
+        if (_Disposing)
         {
-            if (_Disposing)
-            {
-                foreach (var SD in Tunes)
-                { Bass.StreamFree(SD.SoundHandle); }
+            foreach (SongData SD in Tunes)
+            { Bass.StreamFree(SD.SoundHandle); }
 
-                Bass.Free();
-                Bass.PluginFree(BassFlacHandle);
-            }
-
-            DisposedValue = true;
+            Bass.Free();
+            Bass.PluginFree(BassFlacHandle);
         }
+
+        DisposedValue = true;
     }
 
     ~SAPlayer()
@@ -561,9 +565,9 @@ public class SAPlayer : PlayerBase, IDisposable
         
         Stop();
         
-        this.Dispose(true);
+        Dispose(true);
         
-        Log.Warning($"Disposed and closing program");
+        Log.Warning("Disposed and closing program");
     }
     #endregion
 }

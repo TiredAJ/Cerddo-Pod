@@ -7,7 +7,7 @@ namespace Utilities.Zipping;
 
 public class Zipper
 {
-    private static Logger Log;
+    private static Logger Log = null!;
 
     public Zipper()
     { Log = LoggerBuilder.Init().NewLogger().UseDefaultLoc().LogName("Zipper").Build(); }
@@ -24,7 +24,7 @@ public class Zipper
 
         try
         {
-            using (var GZS = new GZipInputStream(File.OpenRead(_ZipSource)))
+            using (GZipInputStream GZS = new(File.OpenRead(_ZipSource)))
             {
                 TarArchive TA = TarArchive.CreateInputTarArchive(GZS, Encoding.UTF8);
                 TA.ExtractContents(_Destination);
@@ -41,7 +41,7 @@ public class Zipper
         Log.Info($"Compressing folder to [{_ZipDestination}].");
         
         Stream OutStream = File.Create(_ZipDestination);
-        var GZOutStream = new GZipOutputStream(OutStream);
+        GZipOutputStream GZOutStream = new(OutStream);
         
         //hmmm, hasn't seemed to affect the size of the output
         GZOutStream.SetLevel(9);
@@ -50,7 +50,7 @@ public class Zipper
         
         TA.RootPath = _Source.Replace('\\', '/');
 
-        if (TA.RootPath.EndsWith("/"))
+        if (TA.RootPath.EndsWith('/'))
         { TA.RootPath = TA.RootPath.Remove(TA.RootPath.Length - 1); }
 
         AddDirectoryFilesToTar(TA, _Source);
@@ -72,9 +72,9 @@ public class Zipper
 
         Log.Info("Adding files to archive.");
         
-        var Files = Directory.GetFiles(_Source);
+        string[] Files = Directory.GetFiles(_Source);
 
-        foreach (var F in Files)
+        foreach (string F in Files)
         {
             Log.Info($"Adding {F} to archive.");
             TE = TarEntry.CreateEntryFromFile(F);

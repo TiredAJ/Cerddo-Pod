@@ -22,7 +22,7 @@ public class PlayerBase : ReactiveObject
     /// <summary>
     /// Audio file types supported by the application
     /// </summary>
-    protected static readonly string[] SUPPORTEDFILETYPES = [".wav", ".mp3", ".ogg", ".aiff", ".mp2", ".mp1", ".flac"];
+    protected static readonly string[] SUPPORTEDFILETYPES;
     /// <summary>
     /// State of Bass' initialisation
     /// </summary>
@@ -82,7 +82,12 @@ public class PlayerBase : ReactiveObject
     /// <summary>
     /// Used to control <see cref="SAPlayer.PositionRunner()">PositionRunner()</see>
     /// </summary>
-    protected ManualResetEventSlim PosRunPause = new(true);    
+    protected ManualResetEventSlim PosRunPause = new(true);
+
+    static PlayerBase()
+    {
+        SUPPORTEDFILETYPES = [".wav", ".mp3", ".ogg", ".aiff", ".mp2", ".mp1", ".flac"];
+    }
     #endregion
 }
 
@@ -111,7 +116,7 @@ public class Syncer
 
 struct MPData
 {
-    private static Logger Log;
+    private static Logger Log = null!;
     
     public MPData()
     {
@@ -135,7 +140,7 @@ public struct SongData
     public Maybe<List<byte>> CoverImg;
     public TimeSpan Duration;
 
-    public static SongData Default = new SongData()
+    public static SongData Default = new()
     {
         SoundHandle = 0,
         ArtistName = "Nessie",
