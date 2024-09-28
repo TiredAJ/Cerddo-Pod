@@ -46,4 +46,4 @@ jobs:
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"TiredAJ_Cerddo-Pod" /o:"tiredaj" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
           cd .\Src\
           dotnet build
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          ..\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
