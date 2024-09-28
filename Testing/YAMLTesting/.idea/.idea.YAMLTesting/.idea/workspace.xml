@@ -7,17 +7,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="821378c3-da4d-4507-a070-3ae5ebce00f9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../Src/Cerddo-Pod.sln.DotSettings" beforeDir="false" afterPath="$PROJECT_DIR$/../../Src/Cerddo-Pod.sln.DotSettings" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Src/Common/Appearance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../Src/Common/Appearance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Src/Player/Src/PlayerExtras.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../Src/Player/Src/PlayerExtras.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Src/Player/Src/SAPlayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../Src/Player/Src/SAPlayer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Src/Player/Utils/BassHelpers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../Src/Player/Utils/BassHelpers.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Src/Player/Utils/Utils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../Src/Player/Utils/Utils.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Src/Utilities/Logger.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../Src/Utilities/Logger.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Src/Utilities/LoggerBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../Src/Utilities/LoggerBase.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Src/Utilities/Platformer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../Src/Utilities/Platformer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Src/Utilities/Zipper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../Src/Utilities/Zipper.cs" afterDir="false" />
+    <list default="true" id="afa75c02-e35f-4b75-a5f4-30f9301b2a37" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.YAMLTesting/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.YAMLTesting/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,9 +37,6 @@
     &quot;accountId&quot;: &quot;63577aea-23c9-4ceb-8613-8684bdb3b809&quot;
   }
 }</component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 8
-}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/eac5daeaa01a4847a8267fc194281269c2d000/81/f2e46f3b/StringWriter.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/30adf657e1e05df2296d456f8bb0bc66db129e636c5d203c63eb404cc2d12cfb/Emitter.cs" root0="FORCE_HIGHLIGHTING" />
@@ -63,19 +52,11 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Project.YAMLTesting.executor": "Debug",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Dev/Cerddo-Pod/Testing/YAMLTesting/YAMLTesting.sln",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/home/tiredaj/Repos",
-    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="YAMLTesting" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
@@ -99,7 +80,7 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="821378c3-da4d-4507-a070-3ae5ebce00f9" name="Changes" comment="" />
+      <changelist id="afa75c02-e35f-4b75-a5f4-30f9301b2a37" name="Changes" comment="" />
       <created>1715358262525</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -108,11 +89,12 @@
       <workItem from="1721824471077" duration="1582000" />
       <workItem from="1722698141827" duration="5000" />
       <workItem from="1722428458222" duration="2288000" />
+      <workItem from="1722960123556" duration="28000" />
+      <workItem from="1722960217034" duration="5674000" />
     </task>
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <option name="LOCAL_CHANGES_DETAILS_PREVIEW_SHOWN" value="false" />
     <option name="LOCAL_CHANGES_DETAILS_PREVIEW_SHOWN" value="false" />
     <ignored-roots>
       <path value="$PROJECT_DIR$" />
@@ -127,10 +109,10 @@
           <line>54</line>
           <properties documentPath="$PROJECT_DIR$/Program.cs" containingFunctionPresentation="Method 'Main'">
             <startOffsets>
-              <option value="2122" />
+              <option value="2050" />
             </startOffsets>
             <endOffsets>
-              <option value="2152" />
+              <option value="2080" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="5" />

@@ -30,12 +30,12 @@ class Program
         Song? DeserialisedSong = null;
         
         var Serialiser = new SerializerBuilder()
-                                            .WithNamingConvention(PascalCaseNamingConvention.Instance)
-                                            .WithTypeResolver(new DynamicTypeResolver())
-                                            .WithTagMapping("!Fade", typeof(Fade))
-                                            .WithTagMapping("!VolumeUp", typeof(VolumeUp))
-                                            .WithTagMapping("!AdjustedEnds", typeof(AdjustedEnds))
-                                            .Build();
+                                .WithNamingConvention(PascalCaseNamingConvention.Instance)
+                                .WithTypeResolver(new DynamicTypeResolver())
+                                .WithTagMapping("!Fade", typeof(Fade))
+                                .WithTagMapping("!VolumeUp", typeof(VolumeUp))
+                                .WithTagMapping("!AdjustedEnds", typeof(AdjustedEnds))
+                                .Build();
 
         var YAMLOutput = Serialiser.Serialize(TempSong);
         Console.Write(YAMLOutput);

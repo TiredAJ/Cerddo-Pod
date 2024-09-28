@@ -240,7 +240,7 @@ public class SAPlayer : PlayerBase, IDisposable
         else
         { return Log.ErrorResult($"Folder \"{_Loc}\" does not exist!"); }
 
-        if (Directory.GetFiles(_Loc).Any(X => X.EndsWith(METAFILEEXT)))
+        if (Array.Exists(Directory.GetFiles(_Loc), X => X.EndsWith(METAFILEEXT)))
         { Log.Info($"{METAFILEEXT} file was found!"); }
         else
         { Log.Warning($"No {METAFILEEXT} datafile was present!"); }
@@ -252,7 +252,6 @@ public class SAPlayer : PlayerBase, IDisposable
     {
         //https://learn.microsoft.com/en-us/dotnet/core/extensions/file-globbing#get-all-matching-files
         string[] Files = Directory.GetFiles(_Loc);
-        //TODO: change to List or IEnumerable?
         Queue<string> Songs = new();
         bool Errors = false;
 
@@ -300,7 +299,7 @@ public class SAPlayer : PlayerBase, IDisposable
             Result R = LoadSongs(Songs);
 
             if (!R.IsFailure)
-            { return Errors ? Log.ErrorResult("Songs failed to load due to above errors.") : Result.Success(); }
+            { return Result.Success(); }
             
             Log.Error($"\t{R.Error}");
             Errors = true;
@@ -357,12 +356,16 @@ public class SAPlayer : PlayerBase, IDisposable
                 Track SongTrackInfo = new(Song);
 
                 if (SongTrackInfo.EmbeddedPictures.Count > 0)
-                { Temp.CoverImg = Maybe.From(SongTrackInfo.EmbeddedPictures.First().PictureData.ToList()); }
+                {
+                    Temp.Info = Temp.Info with
+                    {
+                        CoverImg = Maybe.From(SongTrackInfo.EmbeddedPictures.First().PictureData.ToList())
+                    }; }
                 else
                 { Log.Warning($"No embedded pictures found for {Song}."); }
 
-                Temp.ArtistName = SongTrackInfo.Artist;
-                Temp.SongName = SongTrackInfo.Title ?? Path.GetFileNameWithoutExtension(Song);
+                Temp.Info = Temp.Info with { ArtistName = SongTrackInfo.Artist };
+                Temp.Info = Temp.Info with { SongName = SongTrackInfo.Title ?? Path.GetFileNameWithoutExtension(Song) };
             }
             catch (Exception EXC)
             { return Log.ErrorResult(EXC.Message); }
@@ -416,8 +419,6 @@ public class SAPlayer : PlayerBase, IDisposable
             Log.Info("Subscribed to song end.");
             EndSubscribed = true;
         }
-        
-        //Debug.WriteLine($"[Play] EndSubscribed: {EndSubscribed}");
         
         PosRun = true;
         PosRunPause.Set();
@@ -531,7 +532,7 @@ public class SAPlayer : PlayerBase, IDisposable
     #endregion
 
     #region Disposal
-    protected virtual void Dispose(bool _Disposing)
+    private void Dispose(bool _Disposing)
     {
         Log.Warning("Disposing of SAPlayer!");
 

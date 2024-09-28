@@ -2,6 +2,9 @@
 using ReactiveUI;
 using static Utilities.Logging.LoggerBuilder;
 using CSharpFunctionalExtensions;
+
+using Player.EffectsAdjustments;
+
 using Utilities.Logging;
 
 namespace Player;
@@ -129,32 +132,31 @@ struct MPData
     }
 }
 
-/// <summary>
-/// Contains all the data necessary to represent a song.
-/// </summary>
-public struct SongData
-{
-    public int SoundHandle;
-    public string SongName;
-    public string ArtistName;
-    public Maybe<List<byte>> CoverImg;
-    public TimeSpan Duration;
-
-    public static SongData Default = new()
-    {
-        SoundHandle = 0,
-        ArtistName = "Nessie",
-        SongName = "The Loch",
-        Duration = TimeSpan.MaxValue,
-        CoverImg = new Maybe<List<byte>>()
-    };
-}
-
-/// <summary>
-/// This contains the effects that will be applied
-/// to it's owning song.
-/// </summary>
-public struct SongEffects
+public struct Song
 {
     
 }
+
+
+/// <summary>
+/// Contains all the data necessary to represent a song.
+/// </summary>
+public record SongData
+{
+    public int SoundHandle = -1;
+    public SongInfo Info { get; set; }
+    public TimeSpan Duration = TimeSpan.MaxValue;
+    public List<Effect> Effects = new();
+    public List<Adjustment> Adjustments = new();
+
+    public static SongData Default = new()
+    {
+        SoundHandle = -1,
+        Effects = new(),
+        Adjustments = new(),
+        Info = new SongInfo(),
+        Duration = TimeSpan.MaxValue
+    };
+}
+
+public record SongInfo(string SongName = "The Loch", string ArtistName = "Nessie", Maybe<List<byte>> CoverImg = default);
