@@ -1,8 +1,10 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using Player;
-using ReactiveUI;
 using System.Linq;
+
+using CSharpFunctionalExtensions;
+
 using Utilities.Logging;
 using static Utilities.Logging.LoggerBuilder;
 
@@ -12,15 +14,13 @@ public class MainViewModel : ViewModelBase
 {
     private static FolderPickerOpenOptions FPOO = new()
     { Title = "Mix folder to open", AllowMultiple = false };
-
-    private static Logger Log;
+    
+    private static readonly Logger Log = Loggers["CerddoPod/UI"];
     
     public SAPlayer SAP { get; private set; } = new();
 
     public MainViewModel()
-    {
-        Log = Loggers["CerddoPod/UI"];
-    }
+    {}
 
     public MainViewModel(string _Loc)
     { SAP.LoadMix(_Loc); }
@@ -51,7 +51,7 @@ public class MainViewModel : ViewModelBase
 
         var FolderLoc = await ISP.OpenFolderPickerAsync(FPOO);
 
-        if (FolderLoc.Count > 0 &&  FolderLoc.First().TryGetLocalPath() is { } LP)
+        if (FolderLoc.Count > 0 && FolderLoc[0].TryGetLocalPath() is { } LP)
         { SAP.LoadMix(LP); }
         else
         { Log.Error("FolderLoc count error!"); }        

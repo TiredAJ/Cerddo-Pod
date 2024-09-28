@@ -1,18 +1,13 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Media;
-using Avalonia.Media.Fonts;
 using Avalonia.Threading;
 using System.Collections.Generic;
-using CSharpFunctionalExtensions;
 using ReactiveUI.Fody.Helpers;
-using System;
 using System.Threading.Tasks;
-using Utilities.Logging;
 using Utilities.Logging;
 using Common.Appearance;
 using MixerStudio.Utils;
 using System.Diagnostics;
-using System.Linq;
 
 namespace MixerStudio.ViewModels;
 
@@ -28,22 +23,22 @@ public class AppearanceViewModel : ViewModelBase
     { Log = LoggerBuilder.Loggers["MixerStudio/Appearance"]; }
 
     public void Command_InitControls(Panel _Parent)
-    { InitControls(_Parent); }
-    
-    public async Task InitControls(Panel _Parent)
+    { _ = InitControls(_Parent); }
+
+    private async Task InitControls(Panel _Parent)
     {
         Debug.WriteLine($"Panel name: {_Parent.Name}");
         
-        Dispatcher.UIThread.InvokeAsync(() =>
+        await Dispatcher.UIThread.InvokeAsync(async () =>
         {
-            _InitControls(_Parent); 
+            await _InitControls(_Parent); 
             Debug.WriteLine($"{IntControls.Count} Total controls found");
         });
     }
 
     private async Task _InitControls(Panel _Panel)
     {
-        ControlSpecs CS = new();
+        ControlSpecs CS;
         
         foreach (var C in _Panel.Children)
         {
@@ -52,9 +47,9 @@ public class AppearanceViewModel : ViewModelBase
             Debug.WriteLine($"{_Panel.Children.Count} Controls found");
             
             if (C is Panel P)
-            { _InitControls(P); }
+            { await _InitControls(P); }
             
-            if (C.Name is string Name)
+            if (C.Name is { } Name)
             {
                 if (!IntControls.TryAdd(Name, new ControlSpecs()))
                 { Log.Error($"Duplicate control name found: [{C.Name}]"); }

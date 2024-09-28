@@ -146,5 +146,11 @@ public struct Colour : IEquatable<Colour>
 
     public override int GetHashCode()
     { return HashCode.Combine(R, G, B, A); }
+
+    public static bool operator ==(Colour _Left, Colour _Right)
+    { return _Left.Equals(_Right); }
+
+    public static bool operator !=(Colour _Left, Colour _Right)
+    { return !_Left.Equals(_Right); }
     #endregion
 }
