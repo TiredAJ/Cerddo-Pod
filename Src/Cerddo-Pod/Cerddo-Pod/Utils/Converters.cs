@@ -19,10 +19,10 @@ public static class ConvertersUtils
 
     //take SongData and return the name of the song
     public static FuncValueConverter<SongData, string> SongName { get; } =
-        new(_Value => _Value.SongName);
+        new(_Value => _Value.Info.SongName);
     
     public static FuncValueConverter<SongData, string> Artist { get; } =
-        new(_Value => _Value.ArtistName);
+        new(_Value => _Value.Info.ArtistName);
 
     public static FuncValueConverter<SongData, double> Duration { get; } =
         new(_Value => _Value.Duration.TotalSeconds);
@@ -43,9 +43,9 @@ public static class ConvertersUtils
     public static FuncValueConverter<SongData, Bitmap> BytesToBitmap { get; } =
         new(_Value =>
         {
-            if (_Value.CoverImg.HasNoValue)
+            if (_Value.Info.CoverImg.HasNoValue)
             { return Helpers.DefaultImage; }
             
-            return new Bitmap(new MemoryStream(_Value.CoverImg.Value.ToArray()));
+            return new Bitmap(new MemoryStream(_Value.Info.CoverImg.Value.ToArray()));
         });
 }

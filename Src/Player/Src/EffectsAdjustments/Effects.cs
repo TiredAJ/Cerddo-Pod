@@ -13,7 +13,7 @@ class Adj_AdjustedEnds : Adjustment
     
     public override SongData Run(SongData _Input)
     {
-        
+        throw new NotImplementedException();
     }
 }
 
