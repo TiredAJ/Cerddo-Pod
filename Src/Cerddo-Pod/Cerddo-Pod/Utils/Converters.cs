@@ -19,18 +19,18 @@ public static class ConvertersUtils
 
     //take SongData and return the name of the song
     public static FuncValueConverter<SongData, string> SongName { get; } =
-        new(_Value => _Value.Info.SongName);
+        new(_Value => _Value?.Info.SongName ?? "The Loch");
     
     public static FuncValueConverter<SongData, string> Artist { get; } =
-        new(_Value => _Value.Info.ArtistName);
+        new(_Value => _Value?.Info.ArtistName ?? "Nessie");
 
     public static FuncValueConverter<SongData, double> Duration { get; } =
-        new(_Value => _Value.Duration.TotalSeconds);
+        new(_Value => _Value?.Duration.TotalSeconds ?? 20d);
 
     public static FuncValueConverter<SongData, string> DurationStr { get; } =
-        new(_Value => _Value.Duration.TotalHours >= 1 ? 
+        new(_Value => _Value?.Duration.TotalHours >= 1 ? 
                 TimeSpan.FromSeconds(_Value.Duration.TotalSeconds).ToString("hh\\:mm\\:ss") :
-                TimeSpan.FromSeconds(_Value.Duration.TotalSeconds).ToString("mm\\:ss"));
+                TimeSpan.FromSeconds(_Value?.Duration.TotalSeconds ?? 20d).ToString("mm\\:ss"));
 
     public static FuncValueConverter<double, string> PositionStr { get; } =
         new(_Value => _Value >= 3600 ? 
@@ -43,7 +43,7 @@ public static class ConvertersUtils
     public static FuncValueConverter<SongData, Bitmap> BytesToBitmap { get; } =
         new(_Value =>
         {
-            if (_Value.Info.CoverImg.HasNoValue)
+            if (_Value is null || _Value.Info.CoverImg.HasNoValue)
             { return Helpers.DefaultImage; }
             
             return new Bitmap(new MemoryStream(_Value.Info.CoverImg.Value.ToArray()));

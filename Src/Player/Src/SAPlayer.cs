@@ -40,7 +40,7 @@ public class SAPlayer : PlayerBase, IDisposable
     /// </summary>
     public SongData NowPlaying
     {
-        get => Tunes.Count == 0 ? SongData.Default : Tunes[CurrentSong];
+        get => Tunes.Count == 0 ? SongData.DEFAULT : Tunes[CurrentSong];
         private set => this.RaiseAndSetIfChanged(ref _NowPlaying, value);
     }
     /// <summary>
@@ -92,9 +92,7 @@ public class SAPlayer : PlayerBase, IDisposable
     #region Init
     public SAPlayer()
     {
-        Log = Loggers["CerddoPod/Backend"];
-        
-        Log.Info("SAPlayer initialised");
+        LOG.Info("SAPlayer initialised");
         
         _Init();
     }
@@ -112,7 +110,7 @@ public class SAPlayer : PlayerBase, IDisposable
     {
         if (IsInitialised)
         {
-            Log.Info("Resetting Bass");
+            LOG.Info("Resetting Bass");
             
             //Frees all streams, not sure if necessary when calling Bass.Free()
             foreach (SongData SD in Tunes)
@@ -142,20 +140,20 @@ public class SAPlayer : PlayerBase, IDisposable
                 case OSPlat.FREEBSD:
                 case OSPlat.OTHER:
                 default:
-                { Log.FatalThrow($"Unknown platform! {Platformer.GetPlatformStr()}"); return; }
+                { LOG.FatalThrow($"Unknown platform! {Platformer.GetPlatformStr()}"); return; }
             }
 
             if (BassHelpers.PluginLoad(out BassFlacHandle, FlacPluginName))
-            { Log.Error($"Plugin \"{FlacPluginName}\" could not be loaded! {Bass.LastError}"); }
+            { LOG.Error($"Plugin \"{FlacPluginName}\" could not be loaded! {Bass.LastError}"); }
             else
-            { Log.Info($"Plugin \"{FlacPluginName}\" Loaded."); }
+            { LOG.Info($"Plugin \"{FlacPluginName}\" Loaded."); }
 
             IsInitialised = Bass.Init(-1, 48000, DeviceInitFlags.Stereo);          
 
             if (!IsInitialised)
-            { throw Log.FatalThrow<BassException>($"Bass couldn't initialise! {Bass.LastError}"); }
+            { throw LOG.FatalThrow<BassException>($"Bass couldn't initialise! {Bass.LastError}"); }
             
-            Log.Info("Bass successfully Initialised.");
+            LOG.Info("Bass successfully Initialised.");
 
             DisposedValue = false;
         }
@@ -167,41 +165,41 @@ public class SAPlayer : PlayerBase, IDisposable
     {
         string Loc = _Location;
         
-        Log.Info("Loading mix....");
+        LOG.Info("Loading mix....");
 
         if (File.Exists(Loc))
         {
-            Log.Info("Preparing to unzip Mix...");
+            LOG.Info("Preparing to unzip Mix...");
             
             var R = ExtractFiles(Loc);
 
             if (R.IsFailure)
-            { return Log.ErrorResult(R.Error); }
+            { return LOG.ErrorResult(R.Error); }
 
             Loc = R.Value;
         }
         else 
-        { Log.Warning("Location doesn't seem to be a file, trying directory..."); }        
+        { LOG.Warning("Location doesn't seem to be a file, trying directory..."); }        
         
         if (!Directory.Exists(Loc))
-        { return Log.ErrorResult("Location doesn't seem to be a directory either!"); }
-        Log.Info("Appears to be a directory.");
+        { return LOG.ErrorResult("Location doesn't seem to be a directory either!"); }
+        LOG.Info("Appears to be a directory.");
 
         return _LoadMix(Loc);
     }
 
     private static Result<string> ExtractFiles(string _Location)
     {
-        Log.Info("Extracting files...");
+        LOG.Info("Extracting files...");
         
         string TempLoc = Directory.CreateTempSubdirectory("Cerddo-Pod").FullName;
 
         try
         { Zipper.Extract(_Location, TempLoc); }
         catch (Exception EXC)
-        { return Log.ErrorResult<string>(EXC.ToString()); }
+        { return LOG.ErrorResult<string>(EXC.ToString()); }
 
-        return Log.InfoResult<string>(TempLoc);
+        return LOG.InfoResult<string>(TempLoc);
     }
     
     /// <summary>
@@ -216,7 +214,7 @@ public class SAPlayer : PlayerBase, IDisposable
     {
         //Checks if the object has been disposed, just in case
         if (DisposedValue)
-        { return Log.ErrorResult(DefMsg.PLAYER_DISPOSED); }
+        { return LOG.ErrorResult(DefMsg.PLAYER_DISPOSED); }
 
         //Checks if folder exists
         Result R = FolderChecker(_Location);
@@ -227,7 +225,7 @@ public class SAPlayer : PlayerBase, IDisposable
         R = _LoadFiles(_Location);
 
         if (R.IsFailure)
-        { Log.Error(R.Error); return R; }
+        { LOG.Error(R.Error); return R; }
 
         return R;
     }
@@ -236,16 +234,16 @@ public class SAPlayer : PlayerBase, IDisposable
     {
         //https://learn.microsoft.com/en-us/dotnet/core/extensions/file-globbing#get-all-matching-files
         if (Directory.Exists(_Loc))
-        { Log.Info("Directory exists!"); }
+        { LOG.Info("Directory exists!"); }
         else
-        { return Log.ErrorResult($"Folder \"{_Loc}\" does not exist!"); }
+        { return LOG.ErrorResult($"Folder \"{_Loc}\" does not exist!"); }
 
         if (Array.Exists(Directory.GetFiles(_Loc), X => X.EndsWith(METAFILEEXT)))
-        { Log.Info($"{METAFILEEXT} file was found!"); }
+        { LOG.Info($"{METAFILEEXT} file was found!"); }
         else
-        { Log.Warning($"No {METAFILEEXT} datafile was present!"); }
+        { LOG.Warning($"No {METAFILEEXT} datafile was present!"); }
 
-        return Log.InfoResult("Directory ready for use.");
+        return LOG.InfoResult("Directory ready for use.");
     }
 
     private Result _LoadFiles(string _Loc)
@@ -255,7 +253,7 @@ public class SAPlayer : PlayerBase, IDisposable
         Queue<string> Songs = new();
         bool Errors = false;
 
-        Log.Info($"Found {Files.Length} files in mix directory.");
+        LOG.Info($"Found {Files.Length} files in mix directory.");
 
         foreach (string F in Files)
         {
@@ -283,16 +281,16 @@ public class SAPlayer : PlayerBase, IDisposable
                     if (SUPPORTEDFILETYPES.Contains(Ext))
                     {
                         Songs.Enqueue(F);
-                        Log.Info($"Song \"{Path.GetFileName(F)}\" loaded.");
+                        LOG.Info($"Song \"{Path.GetFileName(F)}\" loaded.");
                     }
                     else
-                    { Log.Warning($"Song \"{Path.GetFileName(F)}\" is of incompatible file type."); }
+                    { LOG.Warning($"Song \"{Path.GetFileName(F)}\" is of incompatible file type."); }
                     break;
                 }
             }
         }
         
-        Log.Info($"Of {Files.Length} file(s), {Songs.Count} song(s) loaded.");
+        LOG.Info($"Of {Files.Length} file(s), {Songs.Count} song(s) loaded.");
 
         if (Songs.Count > 0)
         {
@@ -301,22 +299,22 @@ public class SAPlayer : PlayerBase, IDisposable
             if (!R.IsFailure)
             { return Result.Success(); }
             
-            Log.Error($"\t{R.Error}");
+            LOG.Error($"\t{R.Error}");
             Errors = true;
         }
         else
         {
             Errors = true;
-            Log.Error("\tThere were no (suitable) songs found in mix!");
+            LOG.Error("\tThere were no (suitable) songs found in mix!");
         }
 
-        return Errors ? Log.ErrorResult("Songs failed to load due to above errors.") : Result.Success();
+        return Errors ? LOG.ErrorResult("Songs failed to load due to above errors.") : Result.Success();
     }
 
     private Result LoadSongs(Queue<string> _Songs)
     {
         if (!IsInitialised)
-        { return Log.ErrorResult(DefMsg.BASS_NO_INIT); }
+        { return LOG.ErrorResult(DefMsg.BASS_NO_INIT); }
 
         while (_Songs.Count > 0)
         {
@@ -324,7 +322,7 @@ public class SAPlayer : PlayerBase, IDisposable
 
             SongData Temp = new();
             
-            Log.Info($"Trying to load \"{Song}\".");
+            LOG.Info($"Trying to load \"{Song}\".");
             
             try
             {
@@ -336,8 +334,8 @@ public class SAPlayer : PlayerBase, IDisposable
 
                 if (Temp.SoundHandle == 0)
                 {
-                    Log.Error($"Couldn't load \"{Song}\".");
-                    Log.Error($"\tBass error -> {Bass.LastError}");
+                    LOG.Error($"Couldn't load \"{Song}\".");
+                    LOG.Error($"\tBass error -> {Bass.LastError}");
                 }
                 
                 //Why is this here?
@@ -347,11 +345,11 @@ public class SAPlayer : PlayerBase, IDisposable
                                     .DblToTS();
             }
             catch (Exception EXC)
-            { return Log.ErrorResult(EXC.Message); }
+            { return LOG.ErrorResult(EXC.Message); }
 
             try
             {
-                Log.Info($"Trying to load song info for \"{Song}\".");
+                LOG.Info($"Trying to load song info for \"{Song}\".");
                 
                 Track SongTrackInfo = new(Song);
 
@@ -362,20 +360,20 @@ public class SAPlayer : PlayerBase, IDisposable
                         CoverImg = Maybe.From(SongTrackInfo.EmbeddedPictures.First().PictureData.ToList())
                     }; }
                 else
-                { Log.Warning($"No embedded pictures found for {Song}."); }
+                { LOG.Warning($"No embedded pictures found for {Song}."); }
 
                 Temp.Info = Temp.Info with { ArtistName = SongTrackInfo.Artist };
                 Temp.Info = Temp.Info with { SongName = SongTrackInfo.Title ?? Path.GetFileNameWithoutExtension(Song) };
             }
             catch (Exception EXC)
-            { return Log.ErrorResult(EXC.Message); }
+            { return LOG.ErrorResult(EXC.Message); }
 
             Tunes.Add(Temp);
         }
 
         NowPlaying = Tunes[0];
         
-        return Log.InfoResult("Successfully loaded (some) songs.");
+        return LOG.InfoResult("Successfully loaded (some) songs.");
     }
     #endregion
 
@@ -416,7 +414,7 @@ public class SAPlayer : PlayerBase, IDisposable
         if (!EndSubscribed)
         {
             Syncer.EndOfSong += SyncerOnEndOfSong;
-            Log.Info("Subscribed to song end.");
+            LOG.Info("Subscribed to song end.");
             EndSubscribed = true;
         }
         
@@ -430,7 +428,7 @@ public class SAPlayer : PlayerBase, IDisposable
         if (EndSubscribed)
         {
             Syncer.EndOfSong -= SyncerOnEndOfSong;
-            Log.Info("Unsubscribed from end of song.");
+            LOG.Info("Unsubscribed from end of song.");
             EndSubscribed = false;
         }
         
@@ -505,12 +503,12 @@ public class SAPlayer : PlayerBase, IDisposable
     private bool CheckPlay()
     {
         if (DisposedValue)
-        { Log.Error(DefMsg.PLAYER_DISPOSED); return false; }
+        { LOG.Error(DefMsg.PLAYER_DISPOSED); return false; }
 
         switch (Tunes.Count)
         {
             case 0:
-                Log.Error(DefMsg.TUNE_COUNT); return false;
+                LOG.Error(DefMsg.TUNE_COUNT); return false;
             default:
                 return true; 
         }
@@ -534,7 +532,7 @@ public class SAPlayer : PlayerBase, IDisposable
     #region Disposal
     private void Dispose(bool _Disposing)
     {
-        Log.Warning("Disposing of SAPlayer!");
+        LOG.Warning("Disposing of SAPlayer!");
 
         if (DisposedValue)
         { return; }
@@ -562,13 +560,13 @@ public class SAPlayer : PlayerBase, IDisposable
 
     public void Closing()
     {
-        Log.Warning("Closing!");
+        LOG.Warning("Closing!");
         
         Stop();
         
         Dispose(true);
         
-        Log.Warning("Disposed and closing program");
+        LOG.Warning("Disposed and closing program");
     }
     #endregion
 }

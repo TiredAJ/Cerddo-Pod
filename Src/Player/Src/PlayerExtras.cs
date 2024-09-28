@@ -36,7 +36,7 @@ public class PlayerBase : ReactiveObject
     /// <summary>
     /// Logging object. 
     /// </summary>
-    protected static Logger Log;
+    protected static readonly Logger LOG = Loggers["CerddoPod/Backend"];
     
     /// <summary>
     /// List of loaded songs.
@@ -45,7 +45,7 @@ public class PlayerBase : ReactiveObject
     /// <summary>
     /// Current song
     /// </summary>
-    protected SongData _NowPlaying = SongData.Default;
+    protected SongData _NowPlaying = SongData.DEFAULT;
     /// <summary>
     /// Current position in <see cref="_NowPlaying"/>
     /// </summary>
@@ -144,12 +144,12 @@ public struct Song
 public record SongData
 {
     public int SoundHandle = -1;
-    public SongInfo Info { get; set; }
+    public SongInfo Info { get; set; } = new();
     public TimeSpan Duration = TimeSpan.MaxValue;
     public List<Effect> Effects = new();
     public List<Adjustment> Adjustments = new();
 
-    public static SongData Default = new()
+    public static readonly SongData DEFAULT = new()
     {
         SoundHandle = -1,
         Effects = new(),
